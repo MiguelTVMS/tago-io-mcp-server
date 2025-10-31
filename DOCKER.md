@@ -96,16 +96,19 @@ docker-compose -f docker-compose.dev.yml down
 ### Resource Limits
 
 #### Production
+
 - **Memory**: 512MB limit, 256MB reservation
 - **CPU**: 0.5 cores limit, 0.25 cores reservation
 
 #### Development
+
 - **Memory**: 1GB limit, 512MB reservation
 - **CPU**: 1.0 cores limit, 0.5 cores reservation
 
 ### Health Checks
 
 Both containers include health checks that run every 30 seconds:
+
 - **Test**: Simple Node.js process check
 - **Timeout**: 10 seconds
 - **Retries**: 3 attempts

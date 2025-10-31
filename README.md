@@ -19,7 +19,7 @@ The TagoIO MCP Server enables AI models to interact directly with your TagoIO ac
 
 ### Prerequisites
 
-- Installed Node.js 18+ (https://nodejs.org/en/download/)
+- Installed Node.js 18+ (<https://nodejs.org/en/download/>)
 - TagoIO account with valid profile token or analysis token
 - Compatible AI platform or IDE (see [Supported Platforms](#supported-platforms))
 
