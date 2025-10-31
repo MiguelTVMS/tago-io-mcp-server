@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  tago-mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tago-mcp-server
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - TAGOIO_TOKEN=${TAGOIO_TOKEN}
+      - TAGOIO_API=${TAGOIO_API:-https://api.us-e1.tago.io}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    # Remove port mapping since MCP servers typically use stdio
+    # ports:
+    #   - "3000:3000"
+    # Health check (optional)
+    healthcheck:
+      test: ["CMD", "node", "-e", "process.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    # Logging configuration
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

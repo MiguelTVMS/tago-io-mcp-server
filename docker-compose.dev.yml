@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  tago-mcp-server-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: tago-mcp-server-dev
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=dev
+      - TAGOIO_TOKEN=${TAGOIO_TOKEN}
+      - TAGOIO_API=${TAGOIO_API:-https://api.us-e1.tago.io}
+      - LOG_LEVEL=DEBUG
+    volumes:
+      # Mount source code for hot reload
+      - ./src:/app/src:ro
+      - ./package.json:/app/package.json:ro
+      - ./tsconfig.json:/app/tsconfig.json:ro
+      - ./vitest.config.ts:/app/vitest.config.ts:ro
+      # Mount node_modules as a volume to persist dependencies
+      - node_modules:/app/node_modules
+    # Remove port mapping since MCP servers typically use stdio
+    # ports:
+    #   - "3000:3000"
+    # Health check
+    healthcheck:
+      test: ["CMD", "node", "-e", "process.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # Development resource limits (more generous)
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+    # Logging configuration
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  node_modules:

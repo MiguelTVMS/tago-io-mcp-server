@@ -86,6 +86,35 @@ The MCP server requires a **TagoIO Profile Token** for authentication:
 
 **Security Note**: Keep your profile token secure and never commit it to version control.
 
+## Docker Deployment
+
+For containerized deployments, you can use the provided Docker configuration:
+
+### Quick Start with Docker
+
+```bash
+# Clone the repository
+git clone https://github.com/MiguelTVMS/tago-io-mcp-server.git
+cd tago-io-mcp-server
+
+# Set up environment
+cp .env.example .env
+# Edit .env and set your TAGOIO_TOKEN
+
+# Run with Docker Compose
+npm run docker:run
+
+# View logs
+npm run docker:logs
+```
+
+### Docker Images
+
+- **Production**: `ghcr.io/migueltVMS/tago-io-mcp-server:latest`
+- **Development**: `ghcr.io/migueltVMS/tago-io-mcp-server:dev`
+
+For detailed Docker deployment instructions, see [DOCKER.md](DOCKER.md).
+
 ## API Endpoints
 
 The server supports both US and European TagoIO instances:
