@@ -51,7 +51,7 @@ vitest.config.ts
 coverage/
 
 # Development and build configuration
-tsconfig.json
+# Note: tsconfig.json is needed for building, so NOT excluded
 biome.json
 .prettierrc*
 .eslintrc*
