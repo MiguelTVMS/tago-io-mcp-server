@@ -1,0 +1,1 @@
+d:/Source/github.com/MiguelTVMS/tago-io-mcp-server/CLAUDE.md
