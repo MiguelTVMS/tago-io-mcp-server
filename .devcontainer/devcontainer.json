@@ -8,7 +8,11 @@
   },
   "remoteUser": "node",
   "updateRemoteUserUID": true,
-  "forwardPorts": [8043, 8088, 3000],
+  "forwardPorts": [
+    8043,
+    8088,
+    3000
+  ],
   "postCreateCommand": "npm install -g npm && npm install",
   "customizations": {
     "vscode": {
@@ -27,7 +31,6 @@
         "ardisaurus.gitflow-actions-sidebar",
         "42crunch.vscode-openapi"
       ]
-    },
-    "extensions": ["biomejs.biome", "ardisaurus.gitflow-actions-sidebar"]
+    }
   }
 }

@@ -4,10 +4,10 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { Resources } from '@tago-io/sdk';
 
+import { config } from './config';
 import { handlerTools } from './mcp-tools';
-import { ENV } from './utils/get-env-variables';
 
-if (ENV.NODE_ENV === 'dev') {
+if (config.NODE_ENV === 'development') {
   void import('mcps-logger/console');
 }
 
@@ -17,16 +17,16 @@ if (ENV.NODE_ENV === 'dev') {
 async function startServer() {
   try {
     // Validate required environment variables
-    if (!ENV.TAGOIO_TOKEN) {
+    if (!config.TAGOIO_TOKEN) {
       console.error('Error: TAGOIO_TOKEN environment variable is required');
       process.exit(1);
     }
 
     // Set the TagoIO API endpoint
-    process.env.TAGOIO_API = ENV.TAGOIO_API;
+    process.env.TAGOIO_API = config.TAGOIO_API;
 
     // Initialize TagoIO Resources with the token
-    const resources = new Resources({ token: ENV.TAGOIO_TOKEN });
+    const resources = new Resources({ token: config.TAGOIO_TOKEN });
 
     // Validate the connection to TagoIO API
     await resources.account.info().catch(() => {
@@ -50,7 +50,7 @@ async function startServer() {
     // Connect server to transport
     await mcpServer.connect(transport);
 
-    if (ENV.LOG_LEVEL === 'DEBUG') {
+    if (config.LOG_LEVEL === 'DEBUG') {
       console.error('MCP server started successfully with stdio transport');
       console.error('Tools registered and ready to receive requests');
     }

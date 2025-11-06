@@ -1,6 +1,6 @@
 import type { Resources } from '@tago-io/sdk';
 import { z } from 'zod';
-import { ENV } from '../../../utils/get-env-variables';
+import { config } from '../../../config';
 import { convertJSONToMarkdown } from '../../../utils/markdown';
 import type { IDeviceToolConfig } from '../../types';
 
@@ -27,8 +27,8 @@ async function documentationSearchTool(
   const { search } = params;
 
   let token = 'test';
-  if (!ENV.TEST) {
-    token = ENV.TAGOIO_TOKEN;
+  if (!config.TEST) {
+    token = config.TAGOIO_TOKEN;
   }
   const api = 'https://api.ai.tago.io';
 

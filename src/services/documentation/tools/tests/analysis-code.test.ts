@@ -2,9 +2,10 @@ import { describe, expect, it, vi } from 'vitest';
 import { ZodError } from 'zod';
 import { analysisCodeBaseSchema } from '../analysis-code';
 
-vi.mock('../../../../utils/get-env-variables', () => ({
-  ENV: {
+vi.mock('../../../../config', () => ({
+  config: {
     TAGOIO_TOKEN: 'test',
+    TEST: 'true',
   },
 }));
 

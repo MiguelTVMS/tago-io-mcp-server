@@ -3,7 +3,7 @@
 import { Device, type Resources } from '@tago-io/sdk';
 import type { DataQuery } from '@tago-io/sdk';
 import { z } from 'zod';
-import { ENV } from '../../../utils/get-env-variables';
+import { config } from '../../../config';
 import type { IDeviceToolConfig } from '../../types';
 import { querySchema, validateDeviceDataQuery } from './device-data';
 
@@ -70,8 +70,8 @@ async function deviceDataDeleteTool(resources: Resources, params: DeviceDeleteDa
   const validatedParams = deviceDeleteDataSchema.parse(params);
   const query = validateDeviceDataQuery(validatedParams.query);
 
-  const token = ENV.TAGOIO_TOKEN;
-  const api = ENV.TAGOIO_API;
+  const token = config.TAGOIO_TOKEN;
+  const api = config.TAGOIO_API;
 
   // Simple token type check and direct function call
   return token.startsWith('a-')
