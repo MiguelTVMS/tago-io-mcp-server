@@ -1,12 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-
 // Note: DataQuery SDK type is reported as an "error" type by TypeScript
 
+import { Device, type Resources } from '@tago-io/sdk';
+import type { DataQuery } from '@tago-io/sdk';
 import { z } from 'zod';
-import { Device, Resources } from '@tago-io/sdk';
-import { DataQuery } from '@tago-io/sdk';
 import { ENV } from '../../../utils/get-env-variables';
-import { IDeviceToolConfig } from '../../types';
+import type { IDeviceToolConfig } from '../../types';
 import { querySchema, validateDeviceDataQuery } from './device-data';
 
 // Base schema without refinement - this provides the .shape property needed by MCP
@@ -54,14 +52,13 @@ async function deleteWithAnalysisToken(
 // Simple delete operation - device token
 async function deleteWithDeviceToken(
   resources: Resources,
-  api: string,
+  _api: string,
   deviceID: string,
   query?: DataQuery
 ): Promise<string> {
   const [deviceToken] = await resources.devices.tokenList(deviceID);
   const device = new Device({
     token: deviceToken.token,
-    region: { api: api } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
   });
 
   const result = await device.deleteData(query);
@@ -106,5 +103,5 @@ Delete query parameters apply individually to each specified variable. For examp
   tool: deviceDataDeleteTool,
 };
 
-export { DeviceDeleteDataOperation, deviceDeleteDataConfigJSON };
+export { type DeviceDeleteDataOperation, deviceDeleteDataConfigJSON };
 export { deviceDeleteDataBaseSchema }; // export for testing purposes

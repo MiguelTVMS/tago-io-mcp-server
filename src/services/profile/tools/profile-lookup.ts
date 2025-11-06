@@ -1,9 +1,9 @@
+import type { Resources } from '@tago-io/sdk';
 import { z } from 'zod';
-import { Resources } from '@tago-io/sdk';
 
-import { IDeviceToolConfig } from '../../types';
+import type { SecretsQuery } from '@tago-io/sdk';
 import { convertJSONToMarkdown } from '../../../utils/markdown';
-import { SecretsQuery } from '@tago-io/sdk';
+import type { IDeviceToolConfig } from '../../types';
 
 const profileLookupSchema = z.object({
   operation: z

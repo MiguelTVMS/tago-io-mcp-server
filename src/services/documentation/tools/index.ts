@@ -1,4 +1,4 @@
-import { IDeviceToolConfig } from '../../types';
+import type { IDeviceToolConfig } from '../../types';
 import { analysisCodeConfigJSON } from './analysis-code';
 import { documentationConfigJSON } from './documentation-lookup';
 

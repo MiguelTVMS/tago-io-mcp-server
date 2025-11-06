@@ -1,18 +1,16 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-
 // Note: DataQuery SDK type is reported as an "error" type by TypeScript
 // This causes cascading unsafe operation warnings throughout this file
 
 import { z } from 'zod';
 
-import { Device, Resources } from '@tago-io/sdk';
-import { DataCreate, DataEdit } from '@tago-io/sdk';
-import { DataQuery } from '@tago-io/sdk';
+import { Device, type Resources } from '@tago-io/sdk';
+import type { DataCreate, DataEdit } from '@tago-io/sdk';
+import type { DataQuery } from '@tago-io/sdk';
 
 import { ENV } from '../../../utils/get-env-variables';
 import { convertJSONToMarkdown } from '../../../utils/markdown';
-import { IDeviceToolConfig } from '../../types';
 import { createOperationFactory } from '../../../utils/operation-factory';
+import type { IDeviceToolConfig } from '../../types';
 
 // Zod schema for LocationLatLng
 const locationLatLngSchema = z
@@ -272,41 +270,31 @@ const deviceDataSchema = deviceDataBaseSchema.refine(
 type DeviceDataOperation = z.infer<typeof deviceDataSchema>;
 
 // Query validation utility
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function validateDeviceDataQuery(query: any): DataQuery | undefined {
   if (!query) {
     return undefined;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   if (query.query === 'conditional') {
-
     const { start_date, value, function: fn } = query;
     if (typeof start_date === 'string' && typeof value === 'number' && typeof fn === 'string') {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return query;
-    } else {
-      throw new Error(
-        'Missing required fields for conditional query: start_date (string), value (number), function (string)'
-      );
     }
+    throw new Error(
+      'Missing required fields for conditional query: start_date (string), value (number), function (string)'
+    );
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   if (query.query === 'aggregate') {
-
     const { interval, function: fn } = query;
     if (typeof interval === 'string' && typeof fn === 'string') {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return query;
-    } else {
-      throw new Error(
-        'Missing required fields for aggregate query: interval (string), function (string)'
-      );
     }
+    throw new Error(
+      'Missing required fields for aggregate query: interval (string), function (string)'
+    );
   }
   // For all other queries, return as is
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return query;
 }
 
@@ -338,19 +326,19 @@ function createAnalysisTokenHandler(resources: Resources): IDeviceDataHandler {
 }
 
 // Device token handler implementation
-function createDeviceTokenHandler(resources: Resources, api: string): IDeviceDataHandler {
+function createDeviceTokenHandler(resources: Resources, _api: string): IDeviceDataHandler {
   // Cache device instances to avoid creating them multiple times for the same device
   const deviceCache = new Map<string, Device>();
 
   const getDeviceInstance = async (deviceID: string): Promise<Device> => {
-    if (deviceCache.has(deviceID)) {
-      return deviceCache.get(deviceID)!;
+    const cached = deviceCache.get(deviceID);
+    if (cached) {
+      return cached;
     }
 
     const [deviceToken] = await resources.devices.tokenList(deviceID);
     const device = new Device({
       token: deviceToken.token,
-      region: { api: api } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
     });
 
     deviceCache.set(deviceID, device);
@@ -470,7 +458,7 @@ For time-based queries, use the current date/time reference: ${new Date().toLoca
 
 export {
   deviceDataSchema,
-  DeviceDataOperation,
+  type DeviceDataOperation,
   dataCreateZodSchema,
   dataEditZodSchema,
   deviceDataConfigJSON,

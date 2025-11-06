@@ -1,5 +1,5 @@
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { Resources } from '@tago-io/sdk';
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { Resources } from '@tago-io/sdk';
 import { documentationTools } from './tools';
 
 /**

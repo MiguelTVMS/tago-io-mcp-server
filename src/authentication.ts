@@ -1,6 +1,6 @@
 import { Resources } from '@tago-io/sdk';
 
-import { headersModel, IHeadersModel } from './utils/config.model';
+import { type IHeadersModel, headersModel } from './utils/config.model';
 import { getZodError } from './utils/get-zod-error';
 
 /**

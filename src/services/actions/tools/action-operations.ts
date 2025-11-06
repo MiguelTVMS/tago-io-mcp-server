@@ -1,16 +1,13 @@
-
-
-
 // Note: ActionQuery SDK type is reported as an "error" type by TypeScript
 // This causes cascading unsafe operation warnings throughout this file
 
+import type { Resources } from '@tago-io/sdk';
+import type { ActionCreateInfo, ActionQuery } from '@tago-io/sdk';
 import { z } from 'zod';
-import { Resources } from '@tago-io/sdk';
-import { ActionCreateInfo, ActionQuery } from '@tago-io/sdk';
-import { IDeviceToolConfig } from '../../types';
-import { convertJSONToMarkdown } from '../../../utils/markdown';
 import { querySchema, tagsObjectModel } from '../../../utils/global-params.model';
+import { convertJSONToMarkdown } from '../../../utils/markdown';
 import { createOperationFactory } from '../../../utils/operation-factory';
+import type { IDeviceToolConfig } from '../../types';
 
 const triggerSchema = z.union([
   z
@@ -117,15 +114,17 @@ const triggerSchema = z.union([
 const actionCreateSchema = z
   .object({
     name: z.string().describe('The name for action. (Required)'),
-    type: z.enum([
-      'condition',
-      'resource',
-      'interval',
-      'schedule',
-      'mqtt_topic',
-      'usage_alert',
-      'condition_geofence',
-    ]).describe(`The type of trigger for the action. (Required)
+    type: z
+      .enum([
+        'condition',
+        'resource',
+        'interval',
+        'schedule',
+        'mqtt_topic',
+        'usage_alert',
+        'condition_geofence',
+      ])
+      .describe(`The type of trigger for the action. (Required)
 
 The trigger_type parameter accepts one of seven values:
 - "condition": Monitors device variables against specified conditions (threshold, comparison operators)
@@ -382,9 +381,7 @@ const actionSchema = actionBaseSchema.refine(
 
 type ActionOperation = z.infer<typeof actionSchema>;
 
-function validateActionQuery(
-  query: Record<string, unknown> | undefined
-): ActionQuery | undefined {
+function validateActionQuery(query: Record<string, unknown> | undefined): ActionQuery | undefined {
   if (!query) {
     return undefined;
   }

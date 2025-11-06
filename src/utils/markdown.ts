@@ -6,7 +6,6 @@
  * - Objects are rendered with nested tables.
  * - Primitives are rendered as strings.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function convertJSONToMarkdown(data: any): string {
   if (Array.isArray(data)) {
     if (data.length === 0) {

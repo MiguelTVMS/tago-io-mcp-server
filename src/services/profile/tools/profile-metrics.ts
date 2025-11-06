@@ -1,10 +1,10 @@
-import { Resources } from '@tago-io/sdk';
+import type { Resources } from '@tago-io/sdk';
 import { z } from 'zod';
 
-import { ProfileSummary } from '@tago-io/sdk';
+import type { ProfileSummary } from '@tago-io/sdk';
 import { getProfileID } from '../../../utils/get-profile-id';
 import { convertJSONToMarkdown } from '../../../utils/markdown';
-import { IDeviceToolConfig } from '../../types';
+import type { IDeviceToolConfig } from '../../types';
 
 const profileMetricsSchema = z.object({
   type: z
@@ -43,7 +43,7 @@ type ProfileMetricsSchema = z.infer<typeof profileMetricsSchema>;
  */
 async function profileMetricsTool(resources: Resources, params: ProfileMetricsSchema) {
   const profileID = await getProfileID(resources);
-  let data;
+  let data: unknown;
 
   if (params.type === 'limits') {
     const rawLimits = await resources.profiles.summary(profileID).catch((error) => {
@@ -80,7 +80,6 @@ async function profileMetricsTool(resources: Resources, params: ProfileMetricsSc
     const hasOptions = Object.keys(options).length > 0;
 
     data = await resources.profiles
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
       .usageStatisticList(profileID, hasOptions ? (options as any) : undefined)
       .catch((error) => {
         throw new Error(`**Error fetching profile statistics:** ${error}`);

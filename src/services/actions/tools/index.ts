@@ -1,4 +1,4 @@
-import { IDeviceToolConfig } from '../../types';
+import type { IDeviceToolConfig } from '../../types';
 import { actionOperationsConfigJSON } from './action-operations';
 
 /**

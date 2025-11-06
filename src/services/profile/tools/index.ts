@@ -1,6 +1,6 @@
-import { IDeviceToolConfig } from '../../types';
-import { profileMetricsConfigJSON } from './profile-metrics';
+import type { IDeviceToolConfig } from '../../types';
 import { profileLookupConfigJSON } from './profile-lookup';
+import { profileMetricsConfigJSON } from './profile-metrics';
 
 /**
  * @description Array of all profile tool configurations.

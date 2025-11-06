@@ -1,4 +1,4 @@
-import { Resources } from '@tago-io/sdk';
+import type { Resources } from '@tago-io/sdk';
 
 /**
  * @description Get the ID of the current profile.

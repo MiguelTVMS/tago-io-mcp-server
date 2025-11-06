@@ -95,7 +95,6 @@ describe('analysisCodeBaseSchema', () => {
     it('should reject invalid type', () => {
       const input = {
         search: ['How to create analysis?'],
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
         type: 'invalid-type' as any,
       };
 

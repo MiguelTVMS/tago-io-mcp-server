@@ -1,16 +1,13 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-
 // Note: EntityQuery SDK type is reported as an "error" type by TypeScript
 // This causes cascading unsafe operation warnings throughout this file
 
+import type { Resources } from '@tago-io/sdk';
+import type { EntityQuery } from '@tago-io/sdk';
 import { z } from 'zod';
-import { Resources } from '@tago-io/sdk';
-import { EntityQuery } from '@tago-io/sdk';
-import { IDeviceToolConfig } from '../../types';
-import { convertJSONToMarkdown } from '../../../utils/markdown';
 import { querySchema, tagsObjectModel } from '../../../utils/global-params.model';
+import { convertJSONToMarkdown } from '../../../utils/markdown';
 import { createOperationFactory } from '../../../utils/operation-factory';
+import type { IDeviceToolConfig } from '../../types';
 
 const entityListSchema = querySchema.extend({
   filter: z
@@ -81,7 +78,6 @@ const entitySchema = entityBaseSchema.refine(
 
 type EntitySchema = z.infer<typeof entitySchema>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function validateEntityQuery(query: any): EntityQuery | undefined {
   if (!query) {
     return undefined;

@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv';
 
-import { environmentModel, IEnvironmentModel } from './config.model';
+import { type IEnvironmentModel, environmentModel } from './config.model';
 
 // Load environment variables from .env file.
 dotenv.config();

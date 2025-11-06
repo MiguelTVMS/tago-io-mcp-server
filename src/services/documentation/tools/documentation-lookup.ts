@@ -1,8 +1,8 @@
+import type { Resources } from '@tago-io/sdk';
 import { z } from 'zod';
-import { IDeviceToolConfig } from '../../types';
 import { ENV } from '../../../utils/get-env-variables';
 import { convertJSONToMarkdown } from '../../../utils/markdown';
-import { Resources } from '@tago-io/sdk';
+import type { IDeviceToolConfig } from '../../types';
 
 // Base schema without refinement - this provides the .shape property needed by MCP
 const documentationBaseSchema = z
@@ -43,7 +43,6 @@ async function documentationSearchTool(
     }),
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const data = await response.json();
 
   const markdownResponse = convertJSONToMarkdown(data);

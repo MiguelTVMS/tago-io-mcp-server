@@ -24,4 +24,4 @@ const headersModel = z.object({
 type IEnvironmentModel = z.infer<typeof environmentModel>;
 type IHeadersModel = z.infer<typeof headersModel>;
 
-export { environmentModel, IEnvironmentModel, headersModel, IHeadersModel }; // for testing purposes
+export { environmentModel, type IEnvironmentModel, headersModel, type IHeadersModel }; // for testing purposes

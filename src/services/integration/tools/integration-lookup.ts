@@ -1,15 +1,12 @@
-
-
-
 // Note: NetworkQuery and ConnectorQuery SDK types are reported as "error" types by TypeScript
 // This causes cascading unsafe operation warnings throughout this file
 
+import type { Resources } from '@tago-io/sdk';
+import type { NetworkQuery } from '@tago-io/sdk';
+import type { ConnectorQuery } from '@tago-io/sdk';
 import { z } from 'zod';
-import { Resources } from '@tago-io/sdk';
-import { IDeviceToolConfig } from '../../types';
 import { convertJSONToMarkdown } from '../../../utils/markdown';
-import { NetworkQuery } from '@tago-io/sdk';
-import { ConnectorQuery } from '@tago-io/sdk';
+import type { IDeviceToolConfig } from '../../types';
 
 const integrationQuerySchema = z.object({
   type: z

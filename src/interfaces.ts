@@ -24,4 +24,4 @@ interface JSONRPCError {
   id: string | number | null;
 }
 
-export { JSONRPCRequest, JSONRPCSuccess, JSONRPCError };
+export type { JSONRPCRequest, JSONRPCSuccess, JSONRPCError };

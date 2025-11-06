@@ -1,9 +1,9 @@
+import type { Resources } from '@tago-io/sdk';
 import { z } from 'zod';
-import { Resources } from '@tago-io/sdk';
-import { IDeviceToolConfig } from '../../types';
-import { convertJSONToMarkdown } from '../../../utils/markdown';
 import { querySchema, tagsObjectModel } from '../../../utils/global-params.model';
+import { convertJSONToMarkdown } from '../../../utils/markdown';
 import { createOperationFactory } from '../../../utils/operation-factory';
+import type { IDeviceToolConfig } from '../../types';
 
 const analysisListSchema = querySchema.extend({
   filter: z
@@ -82,15 +82,12 @@ const analysisSchema = analysisBaseSchema.refine(
 
 type AnalysisSchema = z.infer<typeof analysisSchema>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function validateAnalysisQuery(query: any): any {
   if (!query) {
     return undefined;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   const amount = (query.amount as number) ?? 200;
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   let fields = (query.fields as string[]) ?? [
     'id',
     'active',
@@ -105,7 +102,6 @@ function validateAnalysisQuery(query: any): any {
     'run_on',
   ];
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   if (query.include_console as boolean) {
     fields = (fields ?? []).concat(['console']);
   }
@@ -129,7 +125,6 @@ async function handleLookupOperation(
     return convertJSONToMarkdown(result);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const validatedQuery = validateAnalysisQuery(lookupAnalysis);
   const analyses = await resources.analysis.list(validatedQuery).catch((error) => {
     throw new Error(`**Error fetching analyses:** ${(error as Error)?.message ?? error}`);

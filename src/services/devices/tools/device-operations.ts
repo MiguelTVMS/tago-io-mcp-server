@@ -1,12 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-// Note: Many of the SDK types (DeviceQuery, DeviceListItem, etc.) are reported as "error" types by TypeScript
-// This causes cascading unsafe operation warnings throughout this file
-// These are suppressed since they stem from SDK type definitions, not our code
-
-import {
+import type {
   DeviceCreateInfo,
   DeviceEditInfo,
   DeviceListItem,
@@ -17,7 +9,7 @@ import { z } from 'zod';
 import { querySchema, tagsObjectModel } from '../../../utils/global-params.model';
 import { convertJSONToMarkdown } from '../../../utils/markdown';
 import { createOperationFactory } from '../../../utils/operation-factory';
-import { IDeviceToolConfig } from '../../types';
+import type { IDeviceToolConfig } from '../../types';
 
 const configParamSchema = z
   .object({
@@ -197,7 +189,8 @@ type DeviceWithMoreInfo = DeviceListItem & {
 
 const deviceBaseSchema = z
   .object({
-    operation: z.enum(['lookup', 'delete', 'create', 'update', 'configure'])
+    operation: z
+      .enum(['lookup', 'delete', 'create', 'update', 'configure'])
       .describe(`The type of operation to perform on the device.
     lookup: Get the information of a device by its ID or a list of devices by a query.
     delete: Delete a device by its ID.
@@ -255,7 +248,6 @@ const deviceSchema = deviceBaseSchema.refine(
 
 type DeviceSchema = z.infer<typeof deviceSchema>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function validateDeviceQuery(query: any): DeviceQuery | undefined {
   if (!query) {
     return undefined;
@@ -372,7 +364,7 @@ async function handleUpdateOperation(resources: Resources, params: DeviceSchema)
     updateDevice.payload_decoder = Buffer.from(updateDevice.payload_decoder).toString('base64');
   }
 
-  let tokenObject;
+  let tokenObject: Awaited<ReturnType<typeof resources.devices.tokenList>>[0] | undefined;
   if (updateDevice.network || updateDevice.connector || updateDevice.serie_number) {
     [tokenObject] = await resources.devices.tokenList(deviceID);
     await resources.devices.tokenDelete(tokenObject.token);
