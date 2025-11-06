@@ -17,12 +17,12 @@ This is a Model Context Protocol (MCP) server for TagoIO, enabling AI models to 
 
 Reference `.env.example`. Primary variables:
 
-### TagoIO Configuration:
+### TagoIO Configuration
 
 - `TAGOIO_TOKEN` - (required) TagoIO Profile or Analysis token.
 - `TAGOIO_API` - (default: `https://api.us-e1.tago.io`) TagoIO API endpoint.
 
-### MCP Generic Server Configuration:
+### MCP Generic Server Configuration
 
 - `MCP_SERVER_LOG_LEVEL` (default: `info`) - logging verbosity (`debug`, `info`, `warn`, `error`).
 - `MCP_SERVER_LOG_FORMAT` (default: `plain`) - log output format (`plain`,`json`, or `gcp-json`).
@@ -32,7 +32,7 @@ Reference `.env.example`. Primary variables:
 - `MCP_SERVER_USE_HTTP` (default: `false`) - whether to start the HTTP server instead of stdio.
 - `MCP_SERVER_STATEFUL` (default: `false`) - whether to maintain stateful sessions per client.
 
-### MCP Server HTTP Configuration, if `MCP_SERVER_USE_HTTP` is `true`:
+### MCP Server HTTP Configuration, if `MCP_SERVER_USE_HTTP` is `true`
 
 - `MCP_HTTP_PORT` (default: `3000`) - port for the HTTP/SSE server.
 - `MCP_HTTP_HOST` (default: `0.0.0.0`) - host for the HTTP/SSE server.
