@@ -53,8 +53,9 @@ Reference `.env.example`. Primary variables:
 - `src/tagoClient/` — Tago.IO API interaction layer, organized by API tag (e.g., `src/tagoClient/user.ts`, `src/tagoClient/device.ts`). The main client class is in `src/tagoClient/index.ts`.
 - `src/server/` — Code for each implementation of the MCP server e.g. `src/server/http.ts`, `src/server/stdio.ts`. Any common server logic goes into `src/server/common.ts`.
 - `src/types/` - centralized type definitions (API, MCP, errors)
-- `src/tools/` - individual tool files and registration.
-- `src/prompts/` - individual prompt files and registration.
+- `src/tools/` - individual MCP tool files and registration.
+- `src/prompts/` - individual MCP prompt files and registration.
+- `src/resources/` — individual MCP resource files and registration.
 - `tests/` — Unit and integration tests.
 
 ## Development Workflow

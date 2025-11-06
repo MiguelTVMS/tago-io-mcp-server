@@ -5,7 +5,7 @@ import { Resources } from '@tago-io/sdk';
  */
 async function getProfileID(resources: Resources) {
   const profileInfo = await resources.profiles.info('current').catch((error) => {
-    throw `**Error to get profile ID:** ${error}`;
+    throw new Error(`**Error to get profile ID:** ${error}`);
   });
 
   const profileID = profileInfo.info.id;

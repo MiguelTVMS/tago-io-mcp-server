@@ -1,15 +1,15 @@
-import { ZodError } from 'zod/v3';
+import { ZodError } from 'zod';
 
 /**
  * Function to get the error message from zod
  * @param error
  * @returns
  */
-async function getZodError(error: ZodError) {
+function getZodError(error: ZodError) {
   if (error instanceof ZodError) {
-    throw error.issues.shift()?.message;
+    throw new Error(error.issues.shift()?.message);
   }
-  throw error;
+  throw new Error(String(error));
 }
 
 export { getZodError };

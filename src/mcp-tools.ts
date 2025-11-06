@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/require-await */
 import { Resources } from '@tago-io/sdk';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
@@ -15,21 +16,21 @@ import { handlerDocumentationTools } from './services/documentation/index';
  */
 async function handlerTools(server: McpServer, resources: Resources) {
   // Tools for TagoIO actions
-  await handlerActionsTools(server, resources);
+  handlerActionsTools(server, resources);
   // Tools for TagoIO analyses
-  await handlerAnalysesTools(server, resources);
+  handlerAnalysesTools(server, resources);
   // Tools for TagoIO devices
-  await handlerDevicesTools(server, resources);
+  handlerDevicesTools(server, resources);
   // Tools for TagoIO entities
-  await handlerEntitiesTools(server, resources);
+  handlerEntitiesTools(server, resources);
   // Tools for TagoIO users
-  await handlerUsersTools(server, resources);
+  handlerUsersTools(server, resources);
   // Tools for TagoIO profile metrics
-  await handlerProfileMetricsTools(server, resources);
+  handlerProfileMetricsTools(server, resources);
   // Tools for TagoIO integration
-  await handlerIntegrationTools(server, resources);
+  handlerIntegrationTools(server, resources);
   // Tools for TagoIO documentation
-  await handlerDocumentationTools(server, resources);
+  handlerDocumentationTools(server, resources);
 }
 
 export { handlerTools };

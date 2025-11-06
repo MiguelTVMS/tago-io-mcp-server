@@ -6,7 +6,7 @@ import { profileMetricsTools } from './tools';
 /**
  * @description Handler for profile metrics tools to register tools in the MCP server.
  */
-async function handlerProfileMetricsTools(server: McpServer, resources: Resources) {
+function handlerProfileMetricsTools(server: McpServer, resources: Resources) {
   for (const toolConfig of profileMetricsTools) {
     server.tool(
       toolConfig.name,

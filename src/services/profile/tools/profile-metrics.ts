@@ -1,7 +1,7 @@
 import { Resources } from '@tago-io/sdk';
-import { z } from 'zod/v3';
+import { z } from 'zod';
 
-import { ProfileSummary } from '@tago-io/sdk/lib/types';
+import { ProfileSummary } from '@tago-io/sdk';
 import { getProfileID } from '../../../utils/get-profile-id';
 import { convertJSONToMarkdown } from '../../../utils/markdown';
 import { IDeviceToolConfig } from '../../types';
@@ -47,7 +47,7 @@ async function profileMetricsTool(resources: Resources, params: ProfileMetricsSc
 
   if (params.type === 'limits') {
     const rawLimits = await resources.profiles.summary(profileID).catch((error) => {
-      throw `**Error fetching profile limits:** ${error}`;
+      throw new Error(`**Error fetching profile limits:** ${error}`);
     });
 
     const tabularFormat = Object.keys(rawLimits.limit).map((key) => {
@@ -78,11 +78,17 @@ async function profileMetricsTool(resources: Resources, params: ProfileMetricsSc
 
     // Only pass options if at least one parameter is provided
     const hasOptions = Object.keys(options).length > 0;
+
     data = await resources.profiles
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
       .usageStatisticList(profileID, hasOptions ? (options as any) : undefined)
       .catch((error) => {
-        throw `**Error fetching profile statistics:** ${error}`;
+        throw new Error(`**Error fetching profile statistics:** ${error}`);
       });
+  }
+
+  if (!data) {
+    return 'No data available';
   }
 
   let markdownResponse = convertJSONToMarkdown(data);

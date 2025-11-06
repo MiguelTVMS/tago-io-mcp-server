@@ -1,9 +1,8 @@
-import { z } from 'zod/v3';
+import { z } from 'zod';
 import { Resources } from '@tago-io/sdk';
 import { IDeviceToolConfig } from '../../types';
 import { convertJSONToMarkdown } from '../../../utils/markdown';
 import { querySchema, tagsObjectModel } from '../../../utils/global-params.model';
-import { AnalysisQuery } from '@tago-io/sdk/lib/types';
 import { createOperationFactory } from '../../../utils/operation-factory';
 
 const analysisListSchema = querySchema.extend({
@@ -83,13 +82,16 @@ const analysisSchema = analysisBaseSchema.refine(
 
 type AnalysisSchema = z.infer<typeof analysisSchema>;
 
-function validateAnalysisQuery(query: any): AnalysisQuery | undefined {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function validateAnalysisQuery(query: any): any {
   if (!query) {
     return undefined;
   }
 
-  const amount = query.amount || 200;
-  let fields: AnalysisQuery['fields'] = query.fields || [
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  const amount = (query.amount as number) ?? 200;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  let fields = (query.fields as string[]) ?? [
     'id',
     'active',
     'name',
@@ -103,8 +105,9 @@ function validateAnalysisQuery(query: any): AnalysisQuery | undefined {
     'run_on',
   ];
 
-  if (query.include_console) {
-    fields = (fields || []).concat(['console']);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  if (query.include_console as boolean) {
+    fields = (fields ?? []).concat(['console']);
   }
 
   return {
@@ -126,9 +129,10 @@ async function handleLookupOperation(
     return convertJSONToMarkdown(result);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const validatedQuery = validateAnalysisQuery(lookupAnalysis);
   const analyses = await resources.analysis.list(validatedQuery).catch((error) => {
-    throw `**Error fetching analyses:** ${(error as Error)?.message || error}`;
+    throw new Error(`**Error fetching analyses:** ${(error as Error)?.message ?? error}`);
   });
 
   return convertJSONToMarkdown(analyses);

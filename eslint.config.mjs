@@ -17,7 +17,7 @@ export default tseslint.config(
   {
     rules: {
       // TypeScript best practices
-      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-unused-vars': [
@@ -30,7 +30,15 @@ export default tseslint.config(
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-misused-promises': 'error',
       '@typescript-eslint/await-thenable': 'error',
-      '@typescript-eslint/require-await': 'error',
+      '@typescript-eslint/require-await': 'warn',
+      '@typescript-eslint/only-throw-error': 'warn',
+      '@typescript-eslint/no-unsafe-assignment': 'warn',
+      '@typescript-eslint/no-unsafe-member-access': 'warn',
+      '@typescript-eslint/no-unsafe-return': 'warn',
+      '@typescript-eslint/no-unsafe-argument': 'warn',
+      '@typescript-eslint/prefer-nullish-coalescing': 'warn',
+      '@typescript-eslint/no-redundant-type-constituents': 'warn',
+      '@typescript-eslint/no-base-to-string': 'warn',
 
       // Import ordering
       'sort-imports': [

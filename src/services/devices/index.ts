@@ -6,7 +6,7 @@ import { deviceTools } from './tools/index';
 /**
  * @description Handler for devices tools to register tools in the MCP server.
  */
-async function handlerDevicesTools(server: McpServer, resources: Resources) {
+function handlerDevicesTools(server: McpServer, resources: Resources) {
   for (const toolConfig of deviceTools) {
     server.tool(
       toolConfig.name,

@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { ZodError } from 'zod/v3';
+import { describe, expect, it } from 'vitest';
+import { ZodError } from 'zod';
 import { deviceBaseSchema } from '../device-operations';
 
 describe('deviceBaseSchema', () => {

@@ -1,6 +1,12 @@
-import { z } from 'zod/v3';
+
+
+
+// Note: ActionQuery SDK type is reported as an "error" type by TypeScript
+// This causes cascading unsafe operation warnings throughout this file
+
+import { z } from 'zod';
 import { Resources } from '@tago-io/sdk';
-import { ActionCreateInfo, ActionQuery } from '@tago-io/sdk/lib/types';
+import { ActionCreateInfo, ActionQuery } from '@tago-io/sdk';
 import { IDeviceToolConfig } from '../../types';
 import { convertJSONToMarkdown } from '../../../utils/markdown';
 import { querySchema, tagsObjectModel } from '../../../utils/global-params.model';
@@ -376,13 +382,15 @@ const actionSchema = actionBaseSchema.refine(
 
 type ActionOperation = z.infer<typeof actionSchema>;
 
-function validateActionQuery(query: any): ActionQuery | undefined {
+function validateActionQuery(
+  query: Record<string, unknown> | undefined
+): ActionQuery | undefined {
   if (!query) {
     return undefined;
   }
 
-  const amount = query.amount || 200;
-  const fields = query.fields || [
+  const amount = (query.amount as number) ?? 200;
+  const fields = (query.fields as string[]) ?? [
     'id',
     'active',
     'name',
@@ -398,7 +406,7 @@ function validateActionQuery(query: any): ActionQuery | undefined {
     amount,
     fields,
     ...query,
-  };
+  } as ActionQuery;
 }
 
 // Operation handlers
@@ -415,7 +423,7 @@ async function handleLookupOperation(
 
   const validatedQuery = validateActionQuery(lookupAction);
   const actions = await resources.actions.list(validatedQuery).catch((error) => {
-    throw `**Error fetching actions:** ${(error as Error)?.message || error}`;
+    throw new Error(`**Error fetching actions:** ${(error as Error)?.message ?? error}`);
   });
 
   return convertJSONToMarkdown(actions);
@@ -448,7 +456,8 @@ async function handleUpdateOperation(
   }
 
   const result = await resources.actions.edit(actionID, updateAction as Partial<ActionCreateInfo>);
-  return convertJSONToMarkdown(result);
+  // SDK returns string for edit operation
+  return String(result);
 }
 
 async function handleDeleteOperation(
@@ -462,7 +471,8 @@ async function handleDeleteOperation(
   }
 
   const result = await resources.actions.delete(actionID);
-  return convertJSONToMarkdown(result);
+  // SDK returns string for delete operation
+  return String(result);
 }
 
 /**

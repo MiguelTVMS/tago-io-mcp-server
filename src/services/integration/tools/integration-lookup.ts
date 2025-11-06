@@ -1,9 +1,15 @@
-import { z } from 'zod/v3';
+
+
+
+// Note: NetworkQuery and ConnectorQuery SDK types are reported as "error" types by TypeScript
+// This causes cascading unsafe operation warnings throughout this file
+
+import { z } from 'zod';
 import { Resources } from '@tago-io/sdk';
 import { IDeviceToolConfig } from '../../types';
 import { convertJSONToMarkdown } from '../../../utils/markdown';
-import { NetworkQuery } from '@tago-io/sdk/lib/modules/Resources/integration.networks.types';
-import { ConnectorQuery } from '@tago-io/sdk/lib/modules/Resources/integration.connectors.types';
+import { NetworkQuery } from '@tago-io/sdk';
+import { ConnectorQuery } from '@tago-io/sdk';
 
 const integrationQuerySchema = z.object({
   type: z
@@ -84,7 +90,7 @@ async function lookupNetwork(resources: Resources, queryObj: IntegrationQuery): 
 
   const validatedQuery = validateNetworkQuery(queryObj);
   const networks = await resources.integration.networks.list(validatedQuery).catch((error) => {
-    throw `**Error fetching networks:** ${(error as Error)?.message || error}`;
+    throw new Error(`**Error fetching networks:** ${(error as Error)?.message ?? error}`);
   });
   return convertJSONToMarkdown(networks);
 }
@@ -97,7 +103,7 @@ async function lookupConnector(resources: Resources, queryObj: IntegrationQuery)
 
   const validatedQuery = validateConnectorQuery(queryObj);
   const connectors = await resources.integration.connectors.list(validatedQuery).catch((error) => {
-    throw `**Error fetching connectors:** ${(error as Error)?.message || error}`;
+    throw new Error(`**Error fetching connectors:** ${(error as Error)?.message ?? error}`);
   });
   return convertJSONToMarkdown(connectors);
 }

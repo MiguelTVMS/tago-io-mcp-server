@@ -1,8 +1,11 @@
-import { z } from 'zod/v3';
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
+// Note: DataQuery SDK type is reported as an "error" type by TypeScript
+
+import { z } from 'zod';
 import { Device, Resources } from '@tago-io/sdk';
-import { DataQuery } from '@tago-io/sdk/lib/modules/Device/device.types';
+import { DataQuery } from '@tago-io/sdk';
 import { ENV } from '../../../utils/get-env-variables';
-import { convertJSONToMarkdown } from '../../../utils/markdown';
 import { IDeviceToolConfig } from '../../types';
 import { querySchema, validateDeviceDataQuery } from './device-data';
 
@@ -44,7 +47,8 @@ async function deleteWithAnalysisToken(
   query?: DataQuery
 ): Promise<string> {
   const result = await resources.devices.deleteDeviceData(deviceID, query);
-  return convertJSONToMarkdown(result);
+  // SDK returns string for delete operation
+  return String(result);
 }
 
 // Simple delete operation - device token
@@ -57,11 +61,12 @@ async function deleteWithDeviceToken(
   const [deviceToken] = await resources.devices.tokenList(deviceID);
   const device = new Device({
     token: deviceToken.token,
-    region: { api: api } as any,
+    region: { api: api } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
   });
 
   const result = await device.deleteData(query);
-  return convertJSONToMarkdown(result);
+  // SDK returns string for delete operation
+  return String(result);
 }
 
 async function deviceDataDeleteTool(resources: Resources, params: DeviceDeleteDataOperation) {

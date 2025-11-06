@@ -16,8 +16,8 @@ async function authenticate({
   const headers = (await headersModel
     .parseAsync({ authorization: token, 'tagoio-api': tagoioApi })
     .catch(getZodError)
-    .catch(async (error) => {
-      throw { message: `Bad Request: ${error}`, statusCode: 400 };
+    .catch((error) => {
+      throw new Error(`Bad Request: ${error}`);
     })) as IHeadersModel;
 
   // * Set the TagoIO-API environment variable from the request header.
@@ -27,11 +27,9 @@ async function authenticate({
   const resources = new Resources({ token: headers.authorization });
 
   await resources.account.info().catch(() => {
-    throw {
-      message:
-        "Unauthorized: The Authorization or TagoIO-API header is invalid, can't connect to the TagoIO API, check the headers and try again.",
-      statusCode: 401,
-    };
+    throw new Error(
+      "Unauthorized: The Authorization or TagoIO-API header is invalid, can't connect to the TagoIO API, check the headers and try again."
+    );
   });
 
   return resources;

@@ -1,9 +1,9 @@
-import { z } from 'zod/v3';
+import { z } from 'zod';
 import { Resources } from '@tago-io/sdk';
 
 import { IDeviceToolConfig } from '../../types';
 import { convertJSONToMarkdown } from '../../../utils/markdown';
-import { SecretsQuery } from '@tago-io/sdk/lib/modules/Resources/secrets.type';
+import { SecretsQuery } from '@tago-io/sdk';
 
 const profileLookupSchema = z.object({
   operation: z
@@ -44,7 +44,7 @@ async function profileLookupTool(resources: Resources, params: ProfileLookupSche
 
   if (params.operation === 'profile_info') {
     data = await resources.profiles.info('current').catch((error) => {
-      throw `**Error fetching profile information:** ${error}`;
+      throw new Error(`**Error fetching profile information:** ${error}`);
     });
   }
 
@@ -72,7 +72,7 @@ async function profileLookupTool(resources: Resources, params: ProfileLookupSche
     // Only pass query if at least one parameter is provided
     const hasQuery = Object.keys(query).length > 0;
     data = await resources.secrets.list(hasQuery ? query : undefined).catch((error) => {
-      throw `**Error fetching secrets list:** ${error}`;
+      throw new Error(`**Error fetching secrets list:** ${error}`);
     });
   }
 

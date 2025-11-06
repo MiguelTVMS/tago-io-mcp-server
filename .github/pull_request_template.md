@@ -2,10 +2,6 @@
 
 Brief description of the Pull request
 
-### JIRA cards.
-
-- Add Jira Card name
-
 ## Type of alteration
 
 - [ ] Bug fix

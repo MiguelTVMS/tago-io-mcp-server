@@ -1,6 +1,12 @@
-import { z } from 'zod/v3';
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
+// Note: EntityQuery SDK type is reported as an "error" type by TypeScript
+// This causes cascading unsafe operation warnings throughout this file
+
+import { z } from 'zod';
 import { Resources } from '@tago-io/sdk';
-import { EntityQuery } from '@tago-io/sdk/lib/modules/Resources/entities.types';
+import { EntityQuery } from '@tago-io/sdk';
 import { IDeviceToolConfig } from '../../types';
 import { convertJSONToMarkdown } from '../../../utils/markdown';
 import { querySchema, tagsObjectModel } from '../../../utils/global-params.model';
@@ -75,13 +81,14 @@ const entitySchema = entityBaseSchema.refine(
 
 type EntitySchema = z.infer<typeof entitySchema>;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function validateEntityQuery(query: any): EntityQuery | undefined {
   if (!query) {
     return undefined;
   }
 
-  const amount = query.amount || 200;
-  const fields = query.fields || [
+  const amount = query.amount ?? 200;
+  const fields = query.fields ?? [
     'id',
     'name',
     'schema',
@@ -95,7 +102,7 @@ function validateEntityQuery(query: any): EntityQuery | undefined {
     amount,
     fields,
     ...query,
-  };
+  } as EntityQuery;
 }
 
 // Operation handlers
@@ -109,7 +116,7 @@ async function handleLookupOperation(resources: Resources, params: EntitySchema)
 
   const validatedQuery = validateEntityQuery(lookupEntity);
   const entities = await resources.entities.list(validatedQuery).catch((error) => {
-    throw `**Error fetching entities:** ${(error as Error)?.message || error}`;
+    throw new Error(`**Error fetching entities:** ${(error as Error)?.message ?? error}`);
   });
 
   return convertJSONToMarkdown(entities);

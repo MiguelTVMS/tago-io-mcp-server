@@ -1,77 +1,77 @@
 {
-	"name": "tago-io-mcp-server",
-	"version": "1.0",
-	"main": "dist/index.js",
-	"bin": {
-		"tago-mcp-server": "build/index.js"
-	},
-	"type": "commonjs",
-	"files": [
-		"dist"
-	],
-	"scripts": {
-		"build": "tsc -p tsconfig.json",
-		"lint": "eslint .",
-		"lint:fix": "eslint . --fix",
-		"format": "prettier --write .",
-		"check": "npm run lint && npm run format && tsc --noEmit",
-		"dev": "tsx src/index.ts",
-		"start": "node dist/index.js",
-		"docker:build": "docker build -t tago-mcp-server:latest .",
-		"docker:build:dev": "docker build -f Dockerfile.dev -t tago-mcp-server:dev .",
-		"docker:run": "docker-compose up -d",
-		"docker:run:dev": "docker-compose -f docker-compose.dev.yml up -d",
-		"docker:stop": "docker-compose down",
-		"docker:stop:dev": "docker-compose -f docker-compose.dev.yml down",
-		"docker:logs": "docker-compose logs -f tago-mcp-server",
-		"docker:logs:dev": "docker-compose -f docker-compose.dev.yml logs -f tago-mcp-server-dev"
-	},
-	"keywords": [
-		"mcp",
-		"model-context-protocol",
-		"tagoio",
-		"ai",
-		"tools"
-	],
-	"author": {
-		"name": "João Miguel Tabosa Vaz Marques Silva",
-		"email": "joao@miguel.ms"
-	},
-	"engines": {
-		"node": ">=24"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/MiguelTVMS/tago-io-mcp-server.git"
-	},
-	"bugs": {
-		"url": "https://github.com/MiguelTVMS/tago-io-mcp-server/issues"
-	},
-	"license": "ISC",
-	"description": "Model Context Protocol server for TagoIO data and analytics",
-	"devDependencies": {
-		"@eslint/js": "^9.17.0",
-		"@types/aws-lambda": "^8.10.136",
-		"@types/eslint__js": "^8.42.3",
-		"@types/node": "^22.15.21",
-		"aws-cdk-lib": "^2.200.1",
-		"constructs": "^10.3.0",
-		"eslint": "^9.17.0",
-		"prettier": "^3.4.2",
-		"ts-node": "^10.9.2",
-		"ts-node-dev": "^2.0.0",
-		"tsx": "^4.19.2",
-		"typescript": "^5.8.3",
-		"typescript-eslint": "^8.19.1",
-		"unplugin-swc": "^1.5.3",
-		"vitest": "^3.1.4"
-	},
-	"dependencies": {
-		"@modelcontextprotocol/sdk": "^1.17.0",
-		"@tago-io/sdk": "^12.0.3",
-		"dotenv": "^16.5.0",
-		"mcps-logger": "^1.0.0",
-		"shx": "^0.4.0",
-		"zod": "^3.25.28"
-	}
+  "name": "tago-io-mcp-server",
+  "version": "1.0",
+  "main": "dist/index.js",
+  "bin": {
+    "tago-mcp-server": "build/index.js"
+  },
+  "type": "commonjs",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "check": "npm run lint && tsc --noEmit",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "docker:build": "docker build -t tago-mcp-server:latest .",
+    "docker:build:dev": "docker build -f Dockerfile.dev -t tago-mcp-server:dev .",
+    "docker:run": "docker-compose up -d",
+    "docker:run:dev": "docker-compose -f docker-compose.dev.yml up -d",
+    "docker:stop": "docker-compose down",
+    "docker:stop:dev": "docker-compose -f docker-compose.dev.yml down",
+    "docker:logs": "docker-compose logs -f tago-mcp-server",
+    "docker:logs:dev": "docker-compose -f docker-compose.dev.yml logs -f tago-mcp-server-dev"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "tagoio",
+    "ai",
+    "tools"
+  ],
+  "author": {
+    "name": "João Miguel Tabosa Vaz Marques Silva",
+    "email": "joao@miguel.ms"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MiguelTVMS/tago-io-mcp-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MiguelTVMS/tago-io-mcp-server/issues"
+  },
+  "license": "ISC",
+  "description": "Model Context Protocol server for TagoIO data and analytics",
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@types/aws-lambda": "^8.10.157",
+    "@types/eslint__js": "^8.42.3",
+    "@types/node": "^22.19.0",
+    "aws-cdk-lib": "^2.222.0",
+    "constructs": "^10.4.3",
+    "eslint": "^9.17.0",
+    "prettier": "^3.4.2",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.19.1",
+    "unplugin-swc": "^1.5.8",
+    "vitest": "^4.0.7"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.21.0",
+    "@tago-io/sdk": "^12.2.1",
+    "dotenv": "^16.6.1",
+    "mcps-logger": "^1.0.0",
+    "shx": "^0.4.0",
+    "zod": "^3.25.76"
+  }
 }

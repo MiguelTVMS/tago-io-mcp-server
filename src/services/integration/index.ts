@@ -5,7 +5,7 @@ import { integrationTools } from './tools';
 /**
  * @description Handler for network tools to register tools in the MCP server.
  */
-async function handlerIntegrationTools(server: McpServer, resources: Resources) {
+function handlerIntegrationTools(server: McpServer, resources: Resources) {
   for (const toolConfig of integrationTools) {
     server.tool(
       toolConfig.name,

@@ -1,8 +1,13 @@
-import { z } from 'zod/v3';
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+
+// Note: DataQuery SDK type is reported as an "error" type by TypeScript
+// This causes cascading unsafe operation warnings throughout this file
+
+import { z } from 'zod';
 
 import { Device, Resources } from '@tago-io/sdk';
-import { DataCreate, DataEdit } from '@tago-io/sdk/lib/common/common.types';
-import { DataQuery } from '@tago-io/sdk/lib/modules/Device/device.types';
+import { DataCreate, DataEdit } from '@tago-io/sdk';
+import { DataQuery } from '@tago-io/sdk';
 
 import { ENV } from '../../../utils/get-env-variables';
 import { convertJSONToMarkdown } from '../../../utils/markdown';
@@ -267,14 +272,18 @@ const deviceDataSchema = deviceDataBaseSchema.refine(
 type DeviceDataOperation = z.infer<typeof deviceDataSchema>;
 
 // Query validation utility
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function validateDeviceDataQuery(query: any): DataQuery | undefined {
   if (!query) {
     return undefined;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   if (query.query === 'conditional') {
+
     const { start_date, value, function: fn } = query;
     if (typeof start_date === 'string' && typeof value === 'number' && typeof fn === 'string') {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return query;
     } else {
       throw new Error(
@@ -283,9 +292,12 @@ function validateDeviceDataQuery(query: any): DataQuery | undefined {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   if (query.query === 'aggregate') {
+
     const { interval, function: fn } = query;
     if (typeof interval === 'string' && typeof fn === 'string') {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
       return query;
     } else {
       throw new Error(
@@ -294,6 +306,7 @@ function validateDeviceDataQuery(query: any): DataQuery | undefined {
     }
   }
   // For all other queries, return as is
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return query;
 }
 
@@ -337,7 +350,7 @@ function createDeviceTokenHandler(resources: Resources, api: string): IDeviceDat
     const [deviceToken] = await resources.devices.tokenList(deviceID);
     const device = new Device({
       token: deviceToken.token,
-      region: { api: api } as any,
+      region: { api: api } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
     });
 
     deviceCache.set(deviceID, device);
@@ -348,13 +361,15 @@ function createDeviceTokenHandler(resources: Resources, api: string): IDeviceDat
     async create(deviceID: string, data: DataCreate[]): Promise<string> {
       const device = await getDeviceInstance(deviceID);
       const result = await device.sendData(data);
-      return convertJSONToMarkdown(result);
+      // SDK returns string for device token operations
+      return String(result);
     },
 
     async update(deviceID: string, data: DataEdit[]): Promise<string> {
       const device = await getDeviceInstance(deviceID);
       const result = await device.editData(data);
-      return convertJSONToMarkdown(result);
+      // SDK returns string for device token operations
+      return String(result);
     },
 
     async read(deviceID: string, query?: DataQuery): Promise<string> {

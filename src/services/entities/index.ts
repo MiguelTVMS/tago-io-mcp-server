@@ -6,7 +6,7 @@ import { entityTools } from './tools';
 /**
  * @description Handler for entities tools to register tools in the MCP server.
  */
-async function handlerEntitiesTools(server: McpServer, resources: Resources) {
+function handlerEntitiesTools(server: McpServer, resources: Resources) {
   for (const toolConfig of entityTools) {
     server.tool(
       toolConfig.name,

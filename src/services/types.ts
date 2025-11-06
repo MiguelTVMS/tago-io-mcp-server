@@ -1,4 +1,4 @@
-import { ZodRawShape } from 'zod/v3';
+import { ZodRawShape } from 'zod';
 import { Resources } from '@tago-io/sdk';
 
 /**
@@ -39,6 +39,7 @@ interface IDeviceToolConfig {
    * @param params - Parsed and validated parameters from the Zod schema
    * @returns Promise that resolves to a string response (usually Markdown)
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tool: (resources: Resources, params: any) => Promise<string>;
 }
 

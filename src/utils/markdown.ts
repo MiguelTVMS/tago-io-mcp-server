@@ -6,7 +6,8 @@
  * - Objects are rendered with nested tables.
  * - Primitives are rendered as strings.
  */
-export function convertJSONToMarkdown(data: object | Array<object> | unknown): string {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function convertJSONToMarkdown(data: any): string {
   if (Array.isArray(data)) {
     if (data.length === 0) {
       return '_No data found._';
@@ -184,7 +185,7 @@ function valueToMarkdownCell(value: unknown): string {
 }
 
 /**
- * Converts a primitive value to string for Markdown.
+ * Converts a primitive value to a string, handling `null` and `undefined`.
  *
  * @param value - The value to convert.
  * @returns The string representation.
@@ -196,5 +197,12 @@ function primitiveToString(value: unknown): string {
   if (typeof value === 'boolean') {
     return value ? 'true' : 'false';
   }
-  return String(value);
+  if (typeof value === 'string') {
+    return value;
+  }
+  if (typeof value === 'number') {
+    return String(value);
+  }
+  // For objects, arrays, or any other complex type
+  return JSON.stringify(value);
 }

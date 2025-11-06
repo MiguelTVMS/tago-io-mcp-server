@@ -1,39 +1,35 @@
 {
-    "name": "TagoIO MCP",
-    "dockerComposeFile": "docker-compose.yml",
-    "service": "development",
-    "workspaceFolder": "/workspace",
-    "features": {
-        "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  "name": "TagoIO MCP",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "development",
+  "workspaceFolder": "/workspace",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  "remoteUser": "node",
+  "updateRemoteUserUID": true,
+  "forwardPorts": [8043, 8088, 3000],
+  "postCreateCommand": "npm install -g npm && npm install",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "typescript.tsdk": "node_modules/typescript/lib",
+        "eslint.useFlatConfig": true,
+        "eslint.nodePath": "./node_modules",
+        "editor.formatOnPaste": false,
+        "editor.formatOnSave": true
+      },
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ardisaurus.gitflow-actions-sidebar",
+        "42crunch.vscode-openapi"
+      ]
     },
-    "remoteUser": "node",
-    "updateRemoteUserUID": true,
-    "forwardPorts": [
-        8043,
-        8088,
-        3000
-    ],
-    "postCreateCommand": "npm install -g npm && npm install",
-    "customizations": {
-        "vscode": {
-            "settings": {
-                "typescript.tsdk": "node_modules/typescript/lib",
-                "eslint.useFlatConfig": true,
-                "eslint.nodePath": "./node_modules",
-                "editor.formatOnPaste": false,
-                "editor.formatOnSave": true
-            },
-            "extensions": [
-                "dbaeumer.vscode-eslint",
-                "esbenp.prettier-vscode",
-                "ardisaurus.gitflow-actions-sidebar",
-                "42crunch.vscode-openapi"
-            ]
-        },
-        "extensions": [
-            "dbaeumer.vscode-eslint",
-            "esbenp.prettier-vscode",
-            "ardisaurus.gitflow-actions-sidebar"
-        ]
-    }
+    "extensions": [
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "ardisaurus.gitflow-actions-sidebar"
+    ]
+  }
 }

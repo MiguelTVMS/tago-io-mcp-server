@@ -6,7 +6,7 @@ import { userTools } from './tools';
 /**
  * @description Handler for users tools to register tools in the MCP server.
  */
-async function handlerUsersTools(server: McpServer, resources: Resources) {
+function handlerUsersTools(server: McpServer, resources: Resources) {
   for (const toolConfig of userTools) {
     server.tool(
       toolConfig.name,

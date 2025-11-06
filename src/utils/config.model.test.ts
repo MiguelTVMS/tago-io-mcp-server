@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { environmentModel, headersModel } from './config.model';
 
 // Helper to create a valid base object for environment
@@ -31,7 +31,7 @@ describe('environmentModel', () => {
   });
 
   it('throws error if TAGOIO_TOKEN is missing', () => {
-    const { TAGOIO_TOKEN, ...env } = defaultEnv;
+    const { TAGOIO_TOKEN: _TAGOIO_TOKEN, ...env } = defaultEnv;
     expect(() => environmentModel.parse(env)).toThrow();
   });
 
@@ -51,13 +51,13 @@ describe('headersModel', () => {
   });
 
   it('uses default value for tagoio-api', () => {
-    const { 'tagoio-api': tagoApi, ...headers } = defaultHeaders;
+    const { 'tagoio-api': _tagoApi, ...headers } = defaultHeaders;
     const parsed = headersModel.parse(headers);
     expect(parsed['tagoio-api']).toBe('https://api.tago.io');
   });
 
   it('throws error if authorization is missing', () => {
-    const { authorization, ...headers } = defaultHeaders;
+    const { authorization: _authorization, ...headers } = defaultHeaders;
     expect(() => headersModel.parse(headers)).toThrow('Authorization header is required');
   });
 

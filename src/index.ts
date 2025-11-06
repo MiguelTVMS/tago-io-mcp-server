@@ -8,7 +8,7 @@ import { handlerTools } from './mcp-tools';
 import { ENV } from './utils/get-env-variables';
 
 if (ENV.NODE_ENV === 'dev') {
-  import('mcps-logger/console');
+  void import('mcps-logger/console');
 }
 
 /**
@@ -60,4 +60,4 @@ async function startServer() {
   }
 }
 
-startServer();
+void startServer();

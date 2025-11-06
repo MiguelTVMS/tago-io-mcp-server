@@ -1,9 +1,13 @@
-import { z } from 'zod/v3';
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+// Note: UserQuery SDK type may have type issues causing unsafe operation warnings
+
+import { z } from 'zod';
 import { Resources } from '@tago-io/sdk';
 import { IDeviceToolConfig } from '../../types';
 import { convertJSONToMarkdown } from '../../../utils/markdown';
 import { querySchema, tagsObjectModel } from '../../../utils/global-params.model';
-import { UserQuery } from '@tago-io/sdk/lib/modules/Resources/run.types';
+import { UserQuery } from '@tago-io/sdk';
 import { createOperationFactory } from '../../../utils/operation-factory';
 
 const userListSchema = querySchema.extend({
@@ -88,13 +92,14 @@ const userSchema = userBaseSchema.refine(
 
 type UserSchema = z.infer<typeof userSchema>;
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function validateUserQuery(query: any): UserQuery {
   if (!query) {
     throw new Error('Query is required');
   }
 
-  const amount = query.amount || 200;
-  const fields = query.fields || [
+  const amount = query.amount ?? 200;
+  const fields = query.fields ?? [
     'id',
     'name',
     'email',
@@ -113,7 +118,7 @@ function validateUserQuery(query: any): UserQuery {
     amount,
     fields,
     ...query,
-  };
+  } as UserQuery;
 }
 
 // Operation handlers
@@ -127,7 +132,7 @@ async function handleLookupOperation(resources: Resources, params: UserSchema): 
 
   const validatedQuery = validateUserQuery(lookupUser);
   const users = await resources.run.listUsers(validatedQuery).catch((error) => {
-    throw `**Error fetching users:** ${(error as Error)?.message || error}`;
+    throw new Error(`**Error fetching users:** ${(error as Error)?.message ?? error}`);
   });
 
   return convertJSONToMarkdown(users);

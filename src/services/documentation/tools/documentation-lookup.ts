@@ -1,4 +1,4 @@
-import { z } from 'zod/v3';
+import { z } from 'zod';
 import { IDeviceToolConfig } from '../../types';
 import { ENV } from '../../../utils/get-env-variables';
 import { convertJSONToMarkdown } from '../../../utils/markdown';
@@ -43,7 +43,9 @@ async function documentationSearchTool(
     }),
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const data = await response.json();
+
   const markdownResponse = convertJSONToMarkdown(data);
   return markdownResponse;
 }

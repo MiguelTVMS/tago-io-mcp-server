@@ -6,7 +6,7 @@ import { analysisTools } from './tools';
 /**
  * @description Handler for analyses tools to register tools in the MCP server.
  */
-async function handlerAnalysesTools(server: McpServer, resources: Resources) {
+function handlerAnalysesTools(server: McpServer, resources: Resources) {
   for (const toolConfig of analysisTools) {
     server.tool(
       toolConfig.name,
