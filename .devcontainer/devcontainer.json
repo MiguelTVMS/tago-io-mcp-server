@@ -1,5 +1,5 @@
 {
-    "name": "TP-Link Omada MCP",
+    "name": "TagoIO MCP",
     "dockerComposeFile": "docker-compose.yml",
     "service": "development",
     "workspaceFolder": "/workspace",

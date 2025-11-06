@@ -8,7 +8,7 @@ This is a Model Context Protocol (MCP) server for TagoIO, enabling AI models to 
 
 ## Tooling and Runtime
 
-- Node.js 22 LTS (devcontainer base image `mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm`).
+- Node.js 24 LTS (devcontainer base image `mcr.microsoft.com/devcontainers/javascript-node:24-bookworm`).
 - TypeScript 5.9 with `module`/`moduleResolution` set to `NodeNext`.
 - Zod 3.x for configuration validation (the MCP SDK currently expects Zod 3 APIs).
 - ESLint 9 using the flat config (`eslint.config.js`), plus Prettier 3.
