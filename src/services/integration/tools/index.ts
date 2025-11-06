@@ -1,5 +1,5 @@
-import { IDeviceToolConfig } from "../../types";
-import { integrationLookupConfigJSON } from "./integration-lookup";
+import { IDeviceToolConfig } from '../../types';
+import { integrationLookupConfigJSON } from './integration-lookup';
 
 /**
  * @description Array of all entity tool configurations.

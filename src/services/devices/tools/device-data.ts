@@ -1,83 +1,104 @@
-import { z } from "zod/v3";
+import { z } from 'zod/v3';
 
-import { Device, Resources } from "@tago-io/sdk";
-import { DataCreate, DataEdit } from "@tago-io/sdk/lib/common/common.types";
-import { DataQuery } from "@tago-io/sdk/lib/modules/Device/device.types";
+import { Device, Resources } from '@tago-io/sdk';
+import { DataCreate, DataEdit } from '@tago-io/sdk/lib/common/common.types';
+import { DataQuery } from '@tago-io/sdk/lib/modules/Device/device.types';
 
-import { ENV } from "../../../utils/get-env-variables";
-import { convertJSONToMarkdown } from "../../../utils/markdown";
-import { IDeviceToolConfig } from "../../types";
-import { createOperationFactory } from "../../../utils/operation-factory";
+import { ENV } from '../../../utils/get-env-variables';
+import { convertJSONToMarkdown } from '../../../utils/markdown';
+import { IDeviceToolConfig } from '../../types';
+import { createOperationFactory } from '../../../utils/operation-factory';
 
 // Zod schema for LocationLatLng
 const locationLatLngSchema = z
   .object({
-    lat: z.number().describe("Latitude value."),
-    lng: z.number().describe("Longitude value."),
+    lat: z.number().describe('Latitude value.'),
+    lng: z.number().describe('Longitude value.'),
   })
-  .describe("Object with latitude and longitude properties.");
+  .describe('Object with latitude and longitude properties.');
 
 // Zod schema for Metadata (flexible object)
-const metadataSchema = z.record(z.any()).describe("Flexible metadata object for additional data attributes.");
+const metadataSchema = z
+  .record(z.any())
+  .describe('Flexible metadata object for additional data attributes.');
 
 // Zod schema for DataCreate
 const dataCreateZodSchema = z
   .array(
     z.object({
-      variable: z.string().describe("Name of the variable for the data. (Required)"),
-      value: z.union([z.string(), z.number(), z.boolean()]).describe("Data value. Can be string, number, or boolean.").optional(),
-      group: z.string().describe("Group for the data. Used for grouping different data values.").optional(),
-      unit: z.string().describe("Unit for the data value.").optional(),
+      variable: z.string().describe('Name of the variable for the data. (Required)'),
+      value: z
+        .union([z.string(), z.number(), z.boolean()])
+        .describe('Data value. Can be string, number, or boolean.')
+        .optional(),
+      group: z
+        .string()
+        .describe('Group for the data. Used for grouping different data values.')
+        .optional(),
+      unit: z.string().describe('Unit for the data value.').optional(),
       location: z
-        .union([locationLatLngSchema, z.null().describe("No location provided.")])
-        .describe("Location for the data value. Accepts LatLng, or null.")
+        .union([locationLatLngSchema, z.null().describe('No location provided.')])
+        .describe('Location for the data value. Accepts LatLng, or null.')
         .optional(),
       metadata: metadataSchema.optional(),
-      time: z.union([z.string(), z.date()]).describe("Timestamp for the data value. Accepts string (ISO) or Date.").optional(),
+      time: z
+        .union([z.string(), z.date()])
+        .describe('Timestamp for the data value. Accepts string (ISO) or Date.')
+        .optional(),
       // The following are omitted in DataCreate: id, device, created_at
     })
   )
-  .describe("Schema for creating device data (DataCreate type).");
+  .describe('Schema for creating device data (DataCreate type).');
 
 // Zod schema for DataEdit
 const dataEditZodSchema = z
   .array(
     z.object({
-      id: z.string().describe("Data ID. (Required)"),
-      value: z.union([z.string(), z.number(), z.boolean()]).describe("Data value. Can be string, number, or boolean.").optional(),
-      group: z.string().describe("Group for the data. Used for grouping different data values.").optional(),
-      unit: z.string().describe("Unit of measurement for the data value.").optional(),
+      id: z.string().describe('Data ID. (Required)'),
+      value: z
+        .union([z.string(), z.number(), z.boolean()])
+        .describe('Data value. Can be string, number, or boolean.')
+        .optional(),
+      group: z
+        .string()
+        .describe('Group for the data. Used for grouping different data values.')
+        .optional(),
+      unit: z.string().describe('Unit of measurement for the data value.').optional(),
       metadata: metadataSchema.optional(),
-      time: z.union([z.string(), z.date()]).describe("Timestamp for the data value. Accepts string (ISO) or Date.").optional(),
+      time: z
+        .union([z.string(), z.date()])
+        .describe('Timestamp for the data value. Accepts string (ISO) or Date.')
+        .optional(),
       location: z
-        .union([locationLatLngSchema, z.null().describe("No location provided.")])
-        .describe("Location for the data value. Accepts LatLng, or null.")
+        .union([locationLatLngSchema, z.null().describe('No location provided.')])
+        .describe('Location for the data value. Accepts LatLng, or null.')
         .optional(),
     })
   )
-  .describe("Schema for editing device data (DataEdit type).");
+  .describe('Schema for editing device data (DataEdit type).');
 
 const querySchema = z.object({
   query: z
     .enum([
-      "default",
-      "last_item",
-      "last_value",
-      "last_location",
-      "last_insert",
-      "first_item",
-      "first_value",
-      "first_location",
-      "first_insert",
-      "min",
-      "max",
-      "count",
-      "avg",
-      "sum",
-      "aggregate",
-      "conditional",
+      'default',
+      'last_item',
+      'last_value',
+      'last_location',
+      'last_insert',
+      'first_item',
+      'first_value',
+      'first_location',
+      'first_insert',
+      'min',
+      'max',
+      'count',
+      'avg',
+      'sum',
+      'aggregate',
+      'conditional',
     ])
-    .describe(`
+    .describe(
+      `
         Type of query to perform. Determines how device data is retrieved and processed.
 
         Available queries:
@@ -99,37 +120,72 @@ const querySchema = z.object({
         - conditional: Filters data based on value comparison (requires start_date, value, and function parameters)
 
         Note: If the 'end_date' field is not provided, the API will use the current date as the default value.
-      `)
+      `
+    )
     .optional(),
 
   // Common parameters
-  variables: z.array(z.string()).describe("Filter by variables. Array of variable names. E.g: ['temperature', 'humidity']").optional(),
-  groups: z.array(z.string()).describe("Filter by groups. Array of group names. E.g: ['sensors', 'actuators']").optional(),
-  ids: z.array(z.string()).describe("Filter by record IDs. Array of record IDs. E.g: ['507f1f77bcf86cd799439011', '507f1f77bcf86cd799439012']").optional(),
+  variables: z
+    .array(z.string())
+    .describe("Filter by variables. Array of variable names. E.g: ['temperature', 'humidity']")
+    .optional(),
+  groups: z
+    .array(z.string())
+    .describe("Filter by groups. Array of group names. E.g: ['sensors', 'actuators']")
+    .optional(),
+  ids: z
+    .array(z.string())
+    .describe(
+      "Filter by record IDs. Array of record IDs. E.g: ['507f1f77bcf86cd799439011', '507f1f77bcf86cd799439012']"
+    )
+    .optional(),
   values: z
     .array(z.union([z.string(), z.number(), z.boolean()]))
     .describe("Filter by values. Array of string/number/boolean values. E.g: [25.5, 'high', true]")
     .optional(),
-  start_date: z.string().describe("Start date for filtering data as ISO string. E.g: 'YYYY-MM-DDTHH:MM:SSZ' (ISO 8601)").optional(),
-  end_date: z.string().describe("End date for filtering data as ISO string. Default is current date. E.g: 'YYYY-MM-DDTHH:MM:SSZ' (ISO 8601)").optional(),
+  start_date: z
+    .string()
+    .describe("Start date for filtering data as ISO string. E.g: 'YYYY-MM-DDTHH:MM:SSZ' (ISO 8601)")
+    .optional(),
+  end_date: z
+    .string()
+    .describe(
+      "End date for filtering data as ISO string. Default is current date. E.g: 'YYYY-MM-DDTHH:MM:SSZ' (ISO 8601)"
+    )
+    .optional(),
 
   // Default query parameters
-  qty: z.number().min(1).max(10000).describe("Quantity of records to retrieve (max: 10000, min: 1, default: 15)").optional(),
-  ordination: z.enum(["descending", "ascending"]).describe("Change ordination of query. Default is 'descending'. E.g: 'ascending'").optional(),
-  skip: z.number().min(0).describe("Skip records, used on pagination or polling. E.g: 50").optional(),
+  qty: z
+    .number()
+    .min(1)
+    .max(10000)
+    .describe('Quantity of records to retrieve (max: 10000, min: 1, default: 15)')
+    .optional(),
+  ordination: z
+    .enum(['descending', 'ascending'])
+    .describe("Change ordination of query. Default is 'descending'. E.g: 'ascending'")
+    .optional(),
+  skip: z
+    .number()
+    .min(0)
+    .describe('Skip records, used on pagination or polling. E.g: 50')
+    .optional(),
 
   // Aggregate query parameters
   interval: z
-    .enum(["minute", "hour", "day", "month", "quarter", "year"])
-    .describe(`
+    .enum(['minute', 'hour', 'day', 'month', 'quarter', 'year'])
+    .describe(
+      `
         Time interval for aggregation. Used with query='aggregate'. E.g: 'day'
 
         Available intervals: minute, hour, day, month, quarter, year.
-      `)
+      `
+    )
     .optional(),
   function: z
-    .enum(["avg", "sum", "min", "max", "gt", "gte", "lt", "lte", "eq", "ne"])
-    .describe(`
+    .enum(['avg', 'sum', 'min', 'max', 'gt', 'gte', 'lt', 'lte', 'eq', 'ne'])
+    .describe(
+      `
         Function to apply.
 
         For aggregate query:
@@ -147,41 +203,55 @@ const querySchema = z.object({
         - ne: Not equal to (!=)
 
         E.g: 'avg'
-      `)
+      `
+    )
     .optional(),
 
   // Conditional query parameters
-  value: z.number().describe("Value to compare against. Used with query='conditional'. E.g: 25.5").optional(),
+  value: z
+    .number()
+    .describe("Value to compare against. Used with query='conditional'. E.g: 25.5")
+    .optional(),
 });
 
 // Base schema without refinement - this provides the .shape property needed by MCP
 const deviceDataBaseSchema = z
   .object({
-    operation: z.enum(["create", "update", "read"]).describe("The type of operation to perform on the device data."),
+    operation: z
+      .enum(['create', 'update', 'read'])
+      .describe('The type of operation to perform on the device data.'),
     deviceID: z
-      .string({ required_error: "Device ID is required" })
-      .length(24, "Device ID must be 24 characters long")
-      .describe("The ID of the device to perform the operation on."),
+      .string({ required_error: 'Device ID is required' })
+      .length(24, 'Device ID must be 24 characters long')
+      .describe('The ID of the device to perform the operation on.'),
 
     // Separate fields for different operations to maintain type safety
-    createData: dataCreateZodSchema.describe("The data to be created on the device's database. Required for create operations.").optional(),
-    editData: dataEditZodSchema.describe("The data to be edited on the device's database. Required for update operations.").optional(),
+    createData: dataCreateZodSchema
+      .describe("The data to be created on the device's database. Required for create operations.")
+      .optional(),
+    editData: dataEditZodSchema
+      .describe("The data to be edited on the device's database. Required for update operations.")
+      .optional(),
 
     // Fields for read/delete operations
-    query: querySchema.describe("The query to perform retrieve or delete operations on the device's database.").optional(),
+    query: querySchema
+      .describe("The query to perform retrieve or delete operations on the device's database.")
+      .optional(),
   })
-  .describe("Schema for the device data operation. Data Edit require the device to be of the mutable type.");
+  .describe(
+    'Schema for the device data operation. Data Edit require the device to be of the mutable type.'
+  );
 
 // Refined schema with validation logic
 const deviceDataSchema = deviceDataBaseSchema.refine(
   (data) => {
     // Validation for create operation
-    if (data.operation === "create") {
+    if (data.operation === 'create') {
       return !!data.createData;
     }
 
     // Validation for update operation
-    if (data.operation === "update") {
+    if (data.operation === 'update') {
       return !!data.editData;
     }
 
@@ -189,7 +259,8 @@ const deviceDataSchema = deviceDataBaseSchema.refine(
     return true;
   },
   {
-    message: "Invalid data structure for the specified operation. Create requires createData, update requires editData.",
+    message:
+      'Invalid data structure for the specified operation. Create requires createData, update requires editData.',
   }
 );
 
@@ -201,21 +272,25 @@ function validateDeviceDataQuery(query: any): DataQuery | undefined {
     return undefined;
   }
 
-  if (query.query === "conditional") {
+  if (query.query === 'conditional') {
     const { start_date, value, function: fn } = query;
-    if (typeof start_date === "string" && typeof value === "number" && typeof fn === "string") {
+    if (typeof start_date === 'string' && typeof value === 'number' && typeof fn === 'string') {
       return query;
     } else {
-      throw new Error("Missing required fields for conditional query: start_date (string), value (number), function (string)");
+      throw new Error(
+        'Missing required fields for conditional query: start_date (string), value (number), function (string)'
+      );
     }
   }
 
-  if (query.query === "aggregate") {
+  if (query.query === 'aggregate') {
     const { interval, function: fn } = query;
-    if (typeof interval === "string" && typeof fn === "string") {
+    if (typeof interval === 'string' && typeof fn === 'string') {
       return query;
     } else {
-      throw new Error("Missing required fields for aggregate query: interval (string), function (string)");
+      throw new Error(
+        'Missing required fields for aggregate query: interval (string), function (string)'
+      );
     }
   }
   // For all other queries, return as is
@@ -293,29 +368,40 @@ function createDeviceTokenHandler(resources: Resources, api: string): IDeviceDat
 
 // Simple helper to create the appropriate handler
 function createDataHandler(token: string, resources: Resources, api: string): IDeviceDataHandler {
-  return token.startsWith("a-") ? createAnalysisTokenHandler(resources) : createDeviceTokenHandler(resources, api);
+  return token.startsWith('a-')
+    ? createAnalysisTokenHandler(resources)
+    : createDeviceTokenHandler(resources, api);
 }
 
 // Main operation handlers - simple and direct
-async function handleCreateOperation(resources: Resources, params: DeviceDataOperation): Promise<string> {
+async function handleCreateOperation(
+  resources: Resources,
+  params: DeviceDataOperation
+): Promise<string> {
   if (!params.createData) {
-    throw new Error("Invalid create operation: createData is required");
+    throw new Error('Invalid create operation: createData is required');
   }
 
   const handler = createDataHandler(ENV.TAGOIO_TOKEN, resources, ENV.TAGOIO_API);
   return handler.create(params.deviceID, params.createData);
 }
 
-async function handleUpdateOperation(resources: Resources, params: DeviceDataOperation): Promise<string> {
+async function handleUpdateOperation(
+  resources: Resources,
+  params: DeviceDataOperation
+): Promise<string> {
   if (!params.editData) {
-    throw new Error("Invalid update operation: editData is required");
+    throw new Error('Invalid update operation: editData is required');
   }
 
   const handler = createDataHandler(ENV.TAGOIO_TOKEN, resources, ENV.TAGOIO_API);
   return handler.update(params.deviceID, params.editData);
 }
 
-async function handleReadOperation(resources: Resources, params: DeviceDataOperation): Promise<string> {
+async function handleReadOperation(
+  resources: Resources,
+  params: DeviceDataOperation
+): Promise<string> {
   const query = validateDeviceDataQuery(params.query);
   const handler = createDataHandler(ENV.TAGOIO_TOKEN, resources, ENV.TAGOIO_API);
   return handler.read(params.deviceID, query);
@@ -326,15 +412,15 @@ async function deviceDataTool(resources: Resources, params: DeviceDataOperation)
   const validatedParams = deviceDataSchema.parse(params);
 
   const factory = createOperationFactory<DeviceDataOperation>()
-    .register("create", (params) => handleCreateOperation(resources, params))
-    .register("update", (params) => handleUpdateOperation(resources, params))
-    .register("read", (params) => handleReadOperation(resources, params));
+    .register('create', (params) => handleCreateOperation(resources, params))
+    .register('update', (params) => handleUpdateOperation(resources, params))
+    .register('read', (params) => handleReadOperation(resources, params));
 
   return factory.execute(validatedParams);
 }
 
 const deviceDataConfigJSON: IDeviceToolConfig = {
-  name: "device-data-operations",
+  name: 'device-data-operations',
   description: `The DeviceDataOperations tool performs CRUD operations (Create, Read, Update, Delete) on structured data stored within IoT devices and data collection systems. This tool manages individual data points on devices, where each data point consists of a variable name, numerical or string value, unit of measurement, and descriptive metadata properties. The tool operates on two device types: mutable devices (supporting all four operations) and immutable devices (supporting only create and read operations).
 
 Use this tool when you need to store sensor readings, retrieve current device measurements, update existing data values, or remove obsolete data points from connected devices.
@@ -363,8 +449,16 @@ For time-based queries, use the current date/time reference: ${new Date().toLoca
   }
 </example>`,
   parameters: deviceDataBaseSchema.shape,
-  title: "Device Data Operations",
+  title: 'Device Data Operations',
   tool: deviceDataTool,
 };
 
-export { deviceDataSchema, DeviceDataOperation, dataCreateZodSchema, dataEditZodSchema, deviceDataConfigJSON, querySchema, validateDeviceDataQuery };
+export {
+  deviceDataSchema,
+  DeviceDataOperation,
+  dataCreateZodSchema,
+  dataEditZodSchema,
+  deviceDataConfigJSON,
+  querySchema,
+  validateDeviceDataQuery,
+};

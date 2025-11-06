@@ -1,6 +1,6 @@
-import { IDeviceToolConfig } from "../../types";
-import { analysisCodeConfigJSON } from "./analysis-code";
-import { documentationConfigJSON } from "./documentation-lookup";
+import { IDeviceToolConfig } from '../../types';
+import { analysisCodeConfigJSON } from './analysis-code';
+import { documentationConfigJSON } from './documentation-lookup';
 
 /**
  * @description Array of all documentation tool configurations.

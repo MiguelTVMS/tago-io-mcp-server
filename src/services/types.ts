@@ -1,5 +1,5 @@
-import { ZodRawShape } from "zod/v3";
-import { Resources } from "@tago-io/sdk";
+import { ZodRawShape } from 'zod/v3';
+import { Resources } from '@tago-io/sdk';
 
 /**
  * @description Interface for tool configuration.

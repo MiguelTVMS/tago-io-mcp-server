@@ -1,33 +1,42 @@
-import { z } from "zod/v3";
-import { IDeviceToolConfig } from "../../types";
-import { ENV } from "../../../utils/get-env-variables";
-import { convertJSONToMarkdown } from "../../../utils/markdown";
-import { Resources } from "@tago-io/sdk";
+import { z } from 'zod/v3';
+import { IDeviceToolConfig } from '../../types';
+import { ENV } from '../../../utils/get-env-variables';
+import { convertJSONToMarkdown } from '../../../utils/markdown';
+import { Resources } from '@tago-io/sdk';
 
 // Base schema without refinement - this provides the .shape property needed by MCP
 const documentationBaseSchema = z
   .object({
     // Separate fields for different operations to maintain type safety
-    search: z.array(z.string()).min(1).max(5).describe("The questions to search for documentation. This list should contain at least 1 question and maximum 5 questions."),
+    search: z
+      .array(z.string())
+      .min(1)
+      .max(5)
+      .describe(
+        'The questions to search for documentation. This list should contain at least 1 question and maximum 5 questions.'
+      ),
   })
-  .describe("Schema for the documentation operation");
+  .describe('Schema for the documentation operation');
 
 type DocumentationSchema = z.infer<typeof documentationBaseSchema>;
 
-async function documentationSearchTool(_resources: Resources, params: DocumentationSchema): Promise<string> {
+async function documentationSearchTool(
+  _resources: Resources,
+  params: DocumentationSchema
+): Promise<string> {
   const { search } = params;
 
-  let token = "test";
-  if (!process.env.TEST) {
+  let token = 'test';
+  if (!ENV.TEST) {
     token = ENV.TAGOIO_TOKEN;
   }
-  const api = "https://api.ai.tago.io";
+  const api = 'https://api.ai.tago.io';
 
   const response = await fetch(`${api}/rag/documentation`, {
-    method: "POST",
+    method: 'POST',
     headers: {
       Authorization: `${token}`,
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify({
       search,
@@ -40,7 +49,7 @@ async function documentationSearchTool(_resources: Resources, params: Documentat
 }
 
 const documentationConfigJSON: IDeviceToolConfig = {
-  name: "tagoio-documentation-search",
+  name: 'tagoio-documentation-search',
   description: `
         Ground your answer into TagoIO Documentation. Use it to get links and content of relevant documentation. Accepts multiple search queries with automatic deduplication.
 
@@ -64,7 +73,7 @@ const documentationConfigJSON: IDeviceToolConfig = {
         Current Date: ${new Date().toLocaleDateString()}
   `,
   parameters: documentationBaseSchema.shape,
-  title: "Documentation Search",
+  title: 'Documentation Search',
   tool: documentationSearchTool,
 };
 

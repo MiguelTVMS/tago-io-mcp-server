@@ -1,5 +1,5 @@
-import { IDeviceToolConfig } from "../../types";
-import { entityOperationsConfigJSON } from "./entity-operations";
+import { IDeviceToolConfig } from '../../types';
+import { entityOperationsConfigJSON } from './entity-operations';
 
 /**
  * @description Array of all entity tool configurations.

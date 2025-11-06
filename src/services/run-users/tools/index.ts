@@ -1,5 +1,5 @@
-import { IDeviceToolConfig } from "../../types";
-import { userLookupConfigJSON } from "./user-lookup";
+import { IDeviceToolConfig } from '../../types';
+import { userLookupConfigJSON } from './user-lookup';
 
 /**
  * @description Array of all user tool configurations.

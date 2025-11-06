@@ -1,23 +1,31 @@
-import { z } from "zod/v3";
-import { Resources } from "@tago-io/sdk";
-import { IDeviceToolConfig } from "../../types";
-import { convertJSONToMarkdown } from "../../../utils/markdown";
-import { NetworkQuery } from "@tago-io/sdk/lib/modules/Resources/integration.networks.types";
-import { ConnectorQuery } from "@tago-io/sdk/lib/modules/Resources/integration.connectors.types";
+import { z } from 'zod/v3';
+import { Resources } from '@tago-io/sdk';
+import { IDeviceToolConfig } from '../../types';
+import { convertJSONToMarkdown } from '../../../utils/markdown';
+import { NetworkQuery } from '@tago-io/sdk/lib/modules/Resources/integration.networks.types';
+import { ConnectorQuery } from '@tago-io/sdk/lib/modules/Resources/integration.connectors.types';
 
 const integrationQuerySchema = z.object({
-  type: z.enum(["connector", "network"]).describe("The type of resource to query - either connector or network"),
-  id: z.string().describe("The exact ID of the resource to lookup").optional(),
-  name: z.string().describe("The full or partial name of the resource to lookup").optional(),
-  public: z.boolean().describe("Filter by public status. When set to false, it will return only private resources.").optional(),
+  type: z
+    .enum(['connector', 'network'])
+    .describe('The type of resource to query - either connector or network'),
+  id: z.string().describe('The exact ID of the resource to lookup').optional(),
+  name: z.string().describe('The full or partial name of the resource to lookup').optional(),
+  public: z
+    .boolean()
+    .describe('Filter by public status. When set to false, it will return only private resources.')
+    .optional(),
 });
 
 // Base schema without refinement - this provides the .shape property needed by MCP
 const integrationBaseSchema = z
   .object({
-    query: z.array(integrationQuerySchema).min(1).describe("Array of query objects to lookup connectors and networks"),
+    query: z
+      .array(integrationQuerySchema)
+      .min(1)
+      .describe('Array of query objects to lookup connectors and networks'),
   })
-  .describe("Schema for the integration operation.");
+  .describe('Schema for the integration operation.');
 
 type IntegrationQuery = z.infer<typeof integrationQuerySchema>;
 type IntegrationSchema = z.infer<typeof integrationBaseSchema>;
@@ -25,10 +33,10 @@ type IntegrationSchema = z.infer<typeof integrationBaseSchema>;
 function validateNetworkQuery(queryObj: IntegrationQuery): NetworkQuery | undefined {
   const query: NetworkQuery = {
     amount: 10,
-    fields: ["id", "name", "public"],
+    fields: ['id', 'name', 'public'],
   };
 
-  if ("public" in queryObj) {
+  if ('public' in queryObj) {
     query.filter = {
       public: queryObj.public,
     };
@@ -46,10 +54,10 @@ function validateNetworkQuery(queryObj: IntegrationQuery): NetworkQuery | undefi
 function validateConnectorQuery(queryObj: IntegrationQuery): ConnectorQuery | undefined {
   const query: ConnectorQuery = {
     amount: 10,
-    fields: ["id", "name", "networks", "public", "device_parameters"],
+    fields: ['id', 'name', 'networks', 'public', 'device_parameters'],
   };
 
-  if ("public" in queryObj) {
+  if ('public' in queryObj) {
     query.filter = {
       public: queryObj.public,
     };
@@ -105,20 +113,20 @@ async function integrationOperationsTool(resources: Resources, params: Integrati
 
   // Process each query object in the array
   for (const queryObj of query) {
-    if (queryObj.type === "connector") {
+    if (queryObj.type === 'connector') {
       const connectorResult = await lookupConnector(resources, queryObj);
       results.push(`## Connector Results\n\n${connectorResult}`);
-    } else if (queryObj.type === "network") {
+    } else if (queryObj.type === 'network') {
       const networkResult = await lookupNetwork(resources, queryObj);
       results.push(`## Network Results\n\n${networkResult}`);
     }
   }
 
-  return results.join("\n\n");
+  return results.join('\n\n');
 }
 
 const integrationLookupConfigJSON: IDeviceToolConfig = {
-  name: "connector-network-lookup",
+  name: 'connector-network-lookup',
   description: `The ConnectorNetworkLookup tool retrieves connector and network information from the TagoIO platform using either ID or name-based searches. This tool queries the TagoIO database to find specific connectors (pre-defined data decoders) and networks (communication protocol or integrations) that facilitate device connectivity and data transmission within the IoT platform.
   
 The query parameter accepts an array of query objects. Each object must specify a "type" (connector or network) and either an "id" or "name" for lookup. The "public" field can optionally filter results by privacy status. You can query multiple resources in a single request by providing multiple objects in the array.
@@ -143,7 +151,7 @@ When looking up a list of connectors or networks, ALWAYS inform the user that th
   }
 </example>`,
   parameters: integrationBaseSchema.shape,
-  title: "Connector Network Lookup",
+  title: 'Connector Network Lookup',
   tool: integrationOperationsTool,
 };
 

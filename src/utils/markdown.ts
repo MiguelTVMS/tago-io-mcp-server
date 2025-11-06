@@ -9,14 +9,14 @@
 export function convertJSONToMarkdown(data: object | Array<object> | unknown): string {
   if (Array.isArray(data)) {
     if (data.length === 0) {
-      return "_No data found._";
+      return '_No data found._';
     }
-    if (data.every((item) => typeof item === "object" && item !== null && !Array.isArray(item))) {
+    if (data.every((item) => typeof item === 'object' && item !== null && !Array.isArray(item))) {
       return arrayToMarkdownTable(data as Record<string, unknown>[]);
     }
-    return data.map((item) => `- ${primitiveToString(item)}`).join("\n");
+    return data.map((item) => `- ${primitiveToString(item)}`).join('\n');
   }
-  if (typeof data === "object" && data !== null) {
+  if (typeof data === 'object' && data !== null) {
     return objectToNestedMarkdown(data as Record<string, unknown>);
   }
   return primitiveToString(data);
@@ -34,10 +34,12 @@ function arrayToMarkdownTable(arr: Record<string, unknown>[]): string {
       return cols;
     }, new Set<string>())
   );
-  const header = `| ${columns.join(" | ")} |`;
-  const separator = `|${columns.map(() => " --- ").join("|")}|`;
-  const rows = arr.map((obj) => `| ${columns.map((col) => valueToMarkdownCell(obj[col])).join(" | ")} |`);
-  return [header, separator, ...rows].join("\n");
+  const header = `| ${columns.join(' | ')} |`;
+  const separator = `|${columns.map(() => ' --- ').join('|')}|`;
+  const rows = arr.map(
+    (obj) => `| ${columns.map((col) => valueToMarkdownCell(obj[col])).join(' | ')} |`
+  );
+  return [header, separator, ...rows].join('\n');
 }
 
 /**
@@ -47,11 +49,11 @@ function arrayToMarkdownTable(arr: Record<string, unknown>[]): string {
  * @returns The markdown table string
  */
 function regularArrayToTable(arr: unknown[]): string {
-  const header = "| Index | Value |";
-  const separator = "| --- | ----- |";
+  const header = '| Index | Value |';
+  const separator = '| --- | ----- |';
   const rows = arr.map((value, index) => `| ${index} | ${valueToMarkdownCell(value)} |`);
 
-  return [header, separator, ...rows].join("\n");
+  return [header, separator, ...rows].join('\n');
 }
 
 /**
@@ -62,7 +64,10 @@ function regularArrayToTable(arr: unknown[]): string {
  * @returns true if the array should be displayed as a property table
  */
 function isStructuredObjectArray(arr: unknown[]): boolean {
-  if (arr.length === 0 || !arr.every((item) => typeof item === "object" && item !== null && !Array.isArray(item))) {
+  if (
+    arr.length === 0 ||
+    !arr.every((item) => typeof item === 'object' && item !== null && !Array.isArray(item))
+  ) {
     return false;
   }
 
@@ -101,17 +106,22 @@ function objectToNestedMarkdown(obj: Record<string, unknown>): string {
   const result: string[] = [];
 
   for (const [key, value] of Object.entries(obj)) {
-    if (typeof value === "object" && value !== null && !Array.isArray(value) && !(value instanceof Date)) {
+    if (
+      typeof value === 'object' &&
+      value !== null &&
+      !Array.isArray(value) &&
+      !(value instanceof Date)
+    ) {
       // Format nested object as a table
       result.push(`### ${key}:\n`);
       result.push(objectToKeyValueTable(value as Record<string, unknown>));
-      result.push(""); // Add empty line after table
+      result.push(''); // Add empty line after table
     } else if (Array.isArray(value)) {
       // Handle arrays as tables
       result.push(`### ${key}:\n`);
 
       if (value.length === 0) {
-        result.push("_No items_");
+        result.push('_No items_');
       } else if (isStructuredObjectArray(value)) {
         // If array contains objects with consistent structure, use property columns
         result.push(arrayToMarkdownTable(value as Record<string, unknown>[]));
@@ -120,14 +130,14 @@ function objectToNestedMarkdown(obj: Record<string, unknown>): string {
         result.push(regularArrayToTable(value));
       }
 
-      result.push(""); // Add empty line after table
+      result.push(''); // Add empty line after table
     } else {
       // Handle primitives and Date objects
       result.push(`**${key}**: ${valueToMarkdownCell(value)}\n`);
     }
   }
 
-  return result.join("\n");
+  return result.join('\n');
 }
 
 /**
@@ -137,11 +147,13 @@ function objectToNestedMarkdown(obj: Record<string, unknown>): string {
  * @returns The Markdown table string.
  */
 function objectToKeyValueTable(obj: Record<string, unknown>): string {
-  const header = "| Key | Value |";
-  const separator = "| --- | ----- |";
-  const rows = Object.entries(obj).map(([key, value]) => `| ${key} | ${valueToMarkdownCell(value)} |`);
+  const header = '| Key | Value |';
+  const separator = '| --- | ----- |';
+  const rows = Object.entries(obj).map(
+    ([key, value]) => `| ${key} | ${valueToMarkdownCell(value)} |`
+  );
 
-  return [header, separator, ...rows].join("\n");
+  return [header, separator, ...rows].join('\n');
 }
 
 /**
@@ -151,13 +163,17 @@ function objectToKeyValueTable(obj: Record<string, unknown>): string {
  * @returns The Markdown cell string.
  */
 function valueToMarkdownCell(value: unknown): string {
-  if (typeof value === "object" && value !== null) {
+  if (typeof value === 'object' && value !== null) {
     if (Array.isArray(value)) {
       if (value.length === 0) {
-        return "[]";
+        return '[]';
       }
       // Special handling for tags array
-      if (value.every((item) => typeof item === "object" && item !== null && "key" in item && "value" in item)) {
+      if (
+        value.every(
+          (item) => typeof item === 'object' && item !== null && 'key' in item && 'value' in item
+        )
+      ) {
         return `\`${JSON.stringify(value)}\``;
       }
       return `\`${JSON.stringify(value)}\``;
@@ -175,10 +191,10 @@ function valueToMarkdownCell(value: unknown): string {
  */
 function primitiveToString(value: unknown): string {
   if (value === null || value === undefined) {
-    return "_empty_";
+    return '_empty_';
   }
-  if (typeof value === "boolean") {
-    return value ? "true" : "false";
+  if (typeof value === 'boolean') {
+    return value ? 'true' : 'false';
   }
   return String(value);
 }

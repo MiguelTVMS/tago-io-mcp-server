@@ -1,4 +1,4 @@
-import { ZodError } from "zod/v3";
+import { ZodError } from 'zod/v3';
 
 /**
  * Function to get the error message from zod

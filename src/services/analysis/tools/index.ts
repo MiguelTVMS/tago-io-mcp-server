@@ -1,5 +1,5 @@
-import { IDeviceToolConfig } from "../../types";
-import { analysisOperationsConfigJSON } from "./analysis-operations";
+import { IDeviceToolConfig } from '../../types';
+import { analysisOperationsConfigJSON } from './analysis-operations';
 
 /**
  * @description Array of all analysis tool configurations.

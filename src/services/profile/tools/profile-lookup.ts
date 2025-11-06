@@ -1,26 +1,35 @@
-import { z } from "zod/v3";
-import { Resources } from "@tago-io/sdk";
+import { z } from 'zod/v3';
+import { Resources } from '@tago-io/sdk';
 
-import { IDeviceToolConfig } from "../../types";
-import { convertJSONToMarkdown } from "../../../utils/markdown";
-import { SecretsQuery } from "@tago-io/sdk/lib/modules/Resources/secrets.type";
+import { IDeviceToolConfig } from '../../types';
+import { convertJSONToMarkdown } from '../../../utils/markdown';
+import { SecretsQuery } from '@tago-io/sdk/lib/modules/Resources/secrets.type';
 
 const profileLookupSchema = z.object({
-  operation: z.enum(["profile_info", "secrets_list"]).describe("Operation to perform. 'profile_info' gets current profile information, 'secrets_list' lists profile secrets"),
+  operation: z
+    .enum(['profile_info', 'secrets_list'])
+    .describe(
+      "Operation to perform. 'profile_info' gets current profile information, 'secrets_list' lists profile secrets"
+    ),
   secrets_query: z
     .object({
-      amount: z.number().optional().describe("Number of secrets to retrieve (pagination)"),
-      orderBy: z.enum(["created_at", "updated_at", "key"]).optional().describe("Field to order results by. Available options: created_at, updated_at, key"),
+      amount: z.number().optional().describe('Number of secrets to retrieve (pagination)'),
+      orderBy: z
+        .enum(['created_at', 'updated_at', 'key'])
+        .optional()
+        .describe('Field to order results by. Available options: created_at, updated_at, key'),
       filter: z
         .object({
-          id: z.string().optional().describe("Filter by secret ID"),
-          key: z.string().optional().describe("Filter by secret key name"),
+          id: z.string().optional().describe('Filter by secret ID'),
+          key: z.string().optional().describe('Filter by secret key name'),
         })
         .optional()
-        .describe("Filters to apply to the secrets list"),
+        .describe('Filters to apply to the secrets list'),
     })
     .optional()
-    .describe("Query parameters for secrets_list operation. Only used when operation is 'secrets_list'"),
+    .describe(
+      "Query parameters for secrets_list operation. Only used when operation is 'secrets_list'"
+    ),
 });
 
 type ProfileLookupSchema = z.infer<typeof profileLookupSchema>;
@@ -33,13 +42,13 @@ type ProfileLookupSchema = z.infer<typeof profileLookupSchema>;
 async function profileLookupTool(resources: Resources, params: ProfileLookupSchema) {
   let data: unknown;
 
-  if (params.operation === "profile_info") {
-    data = await resources.profiles.info("current").catch((error) => {
+  if (params.operation === 'profile_info') {
+    data = await resources.profiles.info('current').catch((error) => {
       throw `**Error fetching profile information:** ${error}`;
     });
   }
 
-  if (params.operation === "secrets_list") {
+  if (params.operation === 'secrets_list') {
     // Build query object for secrets with only defined values
     const query: Record<string, unknown> = {};
 
@@ -50,7 +59,7 @@ async function profileLookupTool(resources: Resources, params: ProfileLookupSche
       query.orderBy = params.secrets_query.orderBy;
     }
     if (params.secrets_query?.filter) {
-      const filter: SecretsQuery["filter"] = {};
+      const filter: SecretsQuery['filter'] = {};
       if (params.secrets_query.filter.id) {
         filter.id = params.secrets_query.filter.id;
       }
@@ -73,12 +82,12 @@ async function profileLookupTool(resources: Resources, params: ProfileLookupSche
 }
 
 const profileLookupConfigJSON: IDeviceToolConfig = {
-  name: "profile-lookup",
+  name: 'profile-lookup',
   description: `Get profile information or list secrets based on the operation parameter.
 - Use 'profile_info' to get current profile details
 - Use 'secrets_list' to retrieve profile secrets with optional filtering by id/key, ordering, and pagination`,
   parameters: profileLookupSchema.shape,
-  title: "Profile and Secrets Lookup",
+  title: 'Profile and Secrets Lookup',
   tool: profileLookupTool,
 };
 

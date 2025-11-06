@@ -2,7 +2,10 @@
  * Generic operation factory for routing operations to their respective handlers
  */
 export interface OperationFactory<TParams extends { operation: string }, TResult = string> {
-  register: (operationType: string, handler: (params: TParams) => Promise<TResult>) => OperationFactory<TParams, TResult>;
+  register: (
+    operationType: string,
+    handler: (params: TParams) => Promise<TResult>
+  ) => OperationFactory<TParams, TResult>;
   execute: (params: TParams) => Promise<TResult>;
   getOperationTypes: () => string[];
   hasOperation: (operationType: string) => boolean;
@@ -11,7 +14,10 @@ export interface OperationFactory<TParams extends { operation: string }, TResult
 /**
  * Create a new operation factory instance
  */
-export function createOperationFactory<TParams extends { operation: string }, TResult = string>(): OperationFactory<TParams, TResult> {
+export function createOperationFactory<
+  TParams extends { operation: string },
+  TResult = string,
+>(): OperationFactory<TParams, TResult> {
   const operations = new Map<string, (params: TParams) => Promise<TResult>>();
 
   const factory: OperationFactory<TParams, TResult> = {
@@ -35,7 +41,9 @@ export function createOperationFactory<TParams extends { operation: string }, TR
       const handler = operations.get(operation);
 
       if (!handler) {
-        throw new Error(`Unsupported operation: ${operation}. Available operations: ${Array.from(operations.keys()).join(", ")}`);
+        throw new Error(
+          `Unsupported operation: ${operation}. Available operations: ${Array.from(operations.keys()).join(', ')}`
+        );
       }
 
       return handler(params);

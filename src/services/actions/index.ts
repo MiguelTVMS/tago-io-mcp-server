@@ -1,7 +1,7 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { Resources } from "@tago-io/sdk";
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { Resources } from '@tago-io/sdk';
 
-import { actionTools } from "./tools";
+import { actionTools } from './tools';
 
 /**
  * @description Handler for actions tools to register tools in the MCP server.
@@ -15,8 +15,8 @@ async function handlerActionsTools(server: McpServer, resources: Resources) {
       { title: toolConfig.title },
       async (params) => {
         const result = await toolConfig.tool(resources, params);
-        return { content: [{ type: "text", text: result }] };
-      },
+        return { content: [{ type: 'text', text: result }] };
+      }
     );
   }
 }
