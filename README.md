@@ -147,4 +147,15 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-**Need Help?** Visit the [TagoIO Documentation](https://docs.tago.io) or contact our support team.
+## Acknowledgments
+
+This repository is based on the original work from [tago-io/mcp-server](https://github.com/tago-io/mcp-server), created and maintained by:
+
+- [@vitorfdl](https://github.com/vitorfdl)
+- [@bgelatti](https://github.com/bgelatti)
+- [@mateuscardosodeveloper](https://github.com/mateuscardosodeveloper)
+- [@cotrin](https://github.com/cotrin)
+
+---
+
+**Need Help?** Visit the [TagoIO Documentation](https://docs.tago.io).

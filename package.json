@@ -1,21 +1,22 @@
 {
-	"name": "@tago-io/mcp-server",
-	"version": "2.0.1",
-	"main": "build/index.js",
+	"name": "tago-io-mcp-server",
+	"version": "1.0",
+	"main": "dist/index.js",
 	"bin": {
 		"tago-mcp-server": "build/index.js"
 	},
 	"type": "commonjs",
 	"files": [
-		"build"
+		"dist"
 	],
 	"scripts": {
-		"test": "vitest run",
-		"test:single": "vitest --",
-		"linter": "biome lint ./src --no-errors-on-unmatched --diagnostic-level=error",
-		"linter-fix": "biome lint --apply ./src",
-		"build": "rm -rf ./build; tsc --build && shx chmod +x build/*.js",
-		"start": "ts-node-dev  src/index.ts",
+		"build": "tsc -p tsconfig.json",
+		"lint": "eslint . --ext .ts",
+		"lint:fix": "eslint . --ext .ts --fix",
+		"format": "prettier --write .",
+		"check": "npm run lint && tsc --noEmit",
+		"dev": "tsx src/index.ts",
+		"start": "node dist/index.js",
 		"docker:build": "docker build -t tago-mcp-server:latest .",
 		"docker:build:dev": "docker build -f Dockerfile.dev -t tago-mcp-server:dev .",
 		"docker:run": "docker-compose up -d",
@@ -32,11 +33,20 @@
 		"ai",
 		"tools"
 	],
-	"author": "TagoIO",
-	"engines": {
-		"node": ">=20"
+	"author": {
+		"name": "João Miguel Tabosa Vaz Marques Silva",
+		"email": "joao@miguel.ms"
 	},
-	"repository": "tago-io/mcp-server.git",
+	"engines": {
+		"node": ">=24"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/MiguelTVMS/tago-io-mcp-server.git"
+	},
+	"bugs": {
+		"url": "https://github.com/MiguelTVMS/tago-io-mcp-server/issues"
+	},
 	"license": "ISC",
 	"description": "Model Context Protocol server for TagoIO data and analytics",
 	"devDependencies": {

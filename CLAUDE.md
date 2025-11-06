@@ -6,110 +6,86 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a Model Context Protocol (MCP) server for TagoIO, enabling AI models to interact with TagoIO accounts for device management, data analysis, and platform integration. The server is built with TypeScript and uses the MCP SDK to provide tools for accessing TagoIO resources.
 
-## Development Commands
+## Tooling and Runtime
 
-- **Build**: `npm run build` - Compiles TypeScript to JavaScript in the `build/` directory
-- **Test**: `npm test` - Runs all tests using Vitest
-- **Test single file**: `npm run test:single -- [filename]` - Run tests for a specific file
-- **Lint**: `npm run linter` - Check code quality with Biome linter
-- **Lint and fix**: `npm run linter-fix` - Auto-fix linting issues
-- **Development**: `npm start` - Run the server in development mode with ts-node-dev
+- Node.js 22 LTS (devcontainer base image `mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm`).
+- TypeScript 5.9 with `module`/`moduleResolution` set to `NodeNext`.
+- Zod 3.x for configuration validation (the MCP SDK currently expects Zod 3 APIs).
+- ESLint 9 using the flat config (`eslint.config.js`), plus Prettier 3.
 
-## Architecture
+## Environment Variables
 
-### Core Structure
+Reference `.env.example`. Primary variables:
 
-The application follows a modular service-based architecture:
+### TagoIO Configuration:
 
-```
-src/
-├── index.ts                 # Main MCP server entry point
-├── mcp-tools.ts            # Tool registration orchestrator
-├── interfaces.ts           # JSON-RPC interfaces
-├── authentication.ts       # TagoIO authentication logic
-├── services/               # Service modules (devices, actions, etc.)
-└── utils/                  # Shared utilities and models
-```
+- `TAGOIO_TOKEN` - (required) TagoIO Profile or Analysis token.
+- `TAGOIO_API` - (default: `https://api.us-e1.tago.io`) TagoIO API endpoint.
 
-### Service Architecture
+### MCP Generic Server Configuration:
 
-Each service module follows a consistent pattern:
+- `MCP_SERVER_LOG_LEVEL` (default: `info`) - logging verbosity (`debug`, `info`, `warn`, `error`).
+- `MCP_SERVER_LOG_FORMAT` (default: `plain`) - log output format (`plain`,`json`, or `gcp-json`).
+  - `plain` - human-readable text format.
+  - `json` - structured JSON format.
+  - `gcp-json` - structured JSON format compatible with Google Cloud Logging.
+- `MCP_SERVER_USE_HTTP` (default: `false`) - whether to start the HTTP server instead of stdio.
+- `MCP_SERVER_STATEFUL` (default: `false`) - whether to maintain stateful sessions per client.
 
-- **Handler function** (`services/[service]/index.ts`) - Registers MCP tools with the server
-- **Tool implementations** (`services/[service]/tools/`) - Individual tool logic with Zod schemas
-- **Tests** (`services/[service]/tools/tests/`) - Vitest test files
+### MCP Server HTTP Configuration, if `MCP_SERVER_USE_HTTP` is `true`:
 
-### Key Services
+- `MCP_HTTP_PORT` (default: `3000`) - port for the HTTP/SSE server.
+- `MCP_HTTP_HOST` (default: `0.0.0.0`) - host for the HTTP/SSE server.
+- `MCP_HTTP_PATH` (default: `/mcp`) - base path for MCP HTTP endpoints.
+- `MCP_HTTP_ENABLE_HEALTHCHECK` (default: `true`) - enable a healthcheck endpoint at the path indicated on `MCP_HTTP_HEALTHCHECK_PATH`.
+- `MCP_HTTP_HEALTHCHECK_PATH` (default: `/healthz`) - path for the healthcheck endpoint.
+- `MCP_HTTP_ALLOW_CORS` (default: `true`) - enable CORS for the HTTP server.
+- `MCP_HTTP_ALLOWED_HOSTS` (optional) - comma-separated list of allowed hosts for requests.
+- `MCP_HTTP_ALLOWED_ORIGINS` (optional) - comma-separated list of allowed origins for CORS.
+- `MCP_HTTP_NGROK_ENABLED` (default: `false`) - whether to use ngrok to expose the HTTP server publicly.
+- `MCP_HTTP_NGROK_AUTH_TOKEN` (optional) - ngrok auth token, required if `MCP_HTTP_NGROK_ENABLED` is `true`.
 
-1. **Devices** - Device management, data operations, and deletion
-2. **Actions** - TagoIO action lookup and management
-3. **Analysis** - Data analysis and statistical operations
-4. **Entities** - Entity data and operations
-5. **Users** - User lookup and management
-6. **Profile Metrics** - Account statistics and metrics
-7. **Integration** - External integration management
-8. **Documentation** - Code generation and documentation tools
+## Code Structure
 
-### Operation Factory Pattern
+- `src/index.ts` — MCP Server startup, including both stdio and HTTP server initialization. The type of server is selected based on environment variables.
+- `src/config.ts` — Environment variable loading and validation via Zod.
+- `src/utils/` — Utility functions (e.g., logger, error handling).
+- `src/tagoClient/` — Tago.IO API interaction layer, organized by API tag (e.g., `src/tagoClient/user.ts`, `src/tagoClient/device.ts`). The main client class is in `src/tagoClient/index.ts`.
+- `src/server/` — Code for each implementation of the MCP server e.g. `src/server/http.ts`, `src/server/stdio.ts`. Any common server logic goes into `src/server/common.ts`.
+- `src/types/` - centralized type definitions (API, MCP, errors)
+- `src/tools/` - individual tool files and registration.
+- `src/prompts/` - individual prompt files and registration.
+- `tests/` — Unit and integration tests.
 
-The codebase uses a generic operation factory pattern (`utils/operation-factory.ts`) for routing different operation types to their handlers. This allows each tool to support multiple operations through a single MCP tool interface.
+## Development Workflow
 
-### Environment Configuration
+- Install dependencies: `npm install` (runs automatically on container create).
+- Development server: `npm run dev` (tsx watcher).
+- Build: `npm run build` (emits to `dist/`).
+- Lint: `npm run check` (ESLint flat config and Prettier).
+- Launch configurations are available under `.vscode/launch.json` for debugging.
 
-Required environment variables:
+## Contribution Guidelines
 
-- `TAGOIO_TOKEN` - TagoIO Profile or Analysis token (required)
-- `TAGOIO_API` - API endpoint (defaults to US: https://api.us-e1.tago.io)
-- `LOG_LEVEL` - Set to "DEBUG" for verbose logging
-- `NODE_ENV` - Set to "dev" for development logging
+- Keep environment secrets out of the repo; only commit `.env.example`.
+- Ensure `npm run lint` and `npm run build` pass before committing.
+- Reference the OpenAPI spec in `docs/` when adding or updating TagoIO API interactions.
 
-### Schema Validation
+## Formatting & Linting
 
-All tools use Zod for input validation and type safety. Schemas are defined alongside tool implementations and include filtering capabilities for date ranges, ordering, and pagination.
+- Follow Prettier defaults (`npm run format`).
+- ESLint enforces import ordering and TypeScript best practices.
 
-### Testing Strategy
+## Aditional Guidelines
 
-- Uses Vitest for testing with SWC compilation
-- Test files are located in `services/[service]/tools/tests/`
-- Global test configuration in `vitest.config.ts`
-- Tests run from the `src/` directory as root
-
-### Key Dependencies
-
-- `@modelcontextprotocol/sdk` - MCP server implementation
-- `@tago-io/sdk` - TagoIO API client
-- `zod` - Schema validation
-- `biome` - Code linting and formatting
-- `vitest` - Testing framework
-
-## Code Style Guidelines
-
-### Programming Patterns
-
-- **Functional programming**: Prefer functions over ES6 classes
-- **Exports-last pattern**: Place export declarations at the end of files, separate from const declarations
-- **Avoid default exports**: Exception for API controllers and SQL services only
-- **Variable declarations**: Use `const` instead of `let` when variables are not reassigned
-- **Array checks**: Use explicit length checks (`array.length > 0`) instead of truthy/falsy checks
-- **Node.js imports**: Use `node:` prefix for built-in modules (e.g., `import fs from "node:fs"`)
-- **Type assertions**: Prefer `as const` assertions over type assertions where appropriate
-- **Iteration**: Use `for...of` loops instead of `forEach` methods
-
-### Formatting
-
-- Use trailing commas (ES5 style)
-
-### Error Prevention
-
-- No unused variables, labels, or unreachable code
-- No empty block statements or duplicate object keys
-- No fallthrough in switch cases
-- Use `Error` constructor when throwing errors
-- Use `Number.isNaN()` instead of comparing to `NaN`
-- Use `Array.isArray()` instead of `instanceof Array`
-
-### TypeScript Guidelines
-
-- Avoid explicit `any` types (generates info-level warnings)
-- Use modules instead of namespaces
-- No extra non-null assertions or unsafe optional chaining
+- The project follows a GitFlow branching strategy: `main` reflects production-ready code, while `develop` is the integration branch. **All pull requests must target `develop`.**
+- When adding new features or fixing bugs, create a new branch from `develop` and submit a pull request for review.
+- Write unit tests for new functionality and ensure existing tests pass.
+- Keep the reference `.env.example` and this documentation up to date with any new environment variables added to the project.
+- **ONLY** implement using client credentials mode Access processs as described in the TagoIO API documentation. The client credentials should be provided via environment variables.
+- After a tool or prompt is implemented, update the README.md file with a table of supported tools and prompts in the topic Supported TagoIO API Operations. This table should include the operationId, a brief description, and any relevant notes about the implementation. Keep it short and concise.
+- **DON'T** change anything in `node_modules` or commit any changes to that folder.
+- IMPORTANT: Encapsulate the log implementation in `src/utils/logger.ts` to allow easy modification of the logging behavior in the future. Use this logger throughout the codebase instead of direct console.log statements. The logger when in stdio mode should log only to stderr to avoid interleaving with the MCP output.
+- Avoid using the TypeScript `any` type; prefer precise typings or `unknown` when necessary.
+- Any new implementation should be done in both servers, http server and stdio server, to maintain feature parity.
+- **DON'T** use `process.env.` to access environment variables directly. Access should be done outside of `src/config.ts`. All environment variables must be loaded and validated there using Zod, and then imported where needed.
