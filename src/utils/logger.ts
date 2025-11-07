@@ -22,7 +22,9 @@ function createPinoLogger() {
     // In stdio mode (MCP_SERVER_USE_HTTP=false), use stderr to avoid interleaving with MCP output
     // In HTTP mode (MCP_SERVER_USE_HTTP=true), use stdout for standard log output
     const outputFd = useHttp ? 1 : 2; // 1 = stdout, 2 = stderr
-    const outputStream = pino.destination({ dest: outputFd, sync: false });
+    // Use synchronous writes in test environment to make spies work
+    const isTest = process.env.NODE_ENV === 'test' || process.env.VITEST === 'true';
+    const outputStream = pino.destination({ dest: outputFd, sync: isTest });
 
     // Base Pino options
     const baseOptions: pino.LoggerOptions = {

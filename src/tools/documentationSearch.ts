@@ -1,8 +1,9 @@
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { Resources } from '@tago-io/sdk';
 import { z } from 'zod';
-import { config } from '../../../config';
-import type { IDeviceToolConfig } from '../../../types/index.js';
-import { convertJSONToMarkdown } from '../../../utils/markdown';
+import { config } from '../config.js';
+import type { IDeviceToolConfig } from '../types/index.js';
+import { convertJSONToMarkdown } from '../utils/markdown.js';
 
 // Base schema without refinement - this provides the .shape property needed by MCP
 const documentationBaseSchema = z
@@ -78,5 +79,28 @@ const documentationSearchConfigJSON: IDeviceToolConfig = {
   tool: documentationSearchTool,
 };
 
-export { documentationSearchConfigJSON as documentationConfigJSON };
-export { documentationBaseSchema }; //export for testing purposes
+/**
+ * @description Array of all documentation search tool configurations.
+ */
+const documentationSearchTools: IDeviceToolConfig[] = [documentationSearchConfigJSON];
+
+/**
+ * @description Handler for documentation search tools to register tools in the MCP server.
+ */
+function handlerDocumentationSearchTools(server: McpServer, resources: Resources) {
+  for (const toolConfig of documentationSearchTools) {
+    server.tool(
+      toolConfig.name,
+      toolConfig.description,
+      toolConfig.parameters,
+      { title: toolConfig.title },
+      async (params) => {
+        const result = await toolConfig.tool(resources, params);
+        return { content: [{ type: 'text', text: result }] };
+      }
+    );
+  }
+}
+
+export { handlerDocumentationSearchTools };
+export { documentationBaseSchema }; // export for testing purposes

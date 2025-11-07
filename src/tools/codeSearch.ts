@@ -1,8 +1,9 @@
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { Resources } from '@tago-io/sdk';
 import { z } from 'zod';
-import { config } from '../../../config';
-import { convertJSONToMarkdown } from '../../../utils/markdown';
-import type { IDeviceToolConfig } from '../../../types/index.js';
+import { config } from '../config.js';
+import type { IDeviceToolConfig } from '../types/index.js';
+import { convertJSONToMarkdown } from '../utils/markdown.js';
 
 // Base schema without refinement - this provides the .shape property needed by MCP
 const analysisCodeBaseSchema = z
@@ -55,8 +56,8 @@ async function analysisCodeSearchTool(
   return markdownResponse;
 }
 
-const analysisCodeConfigJSON: IDeviceToolConfig = {
-  name: 'tagoio-code-search',
+const codeSearchConfig: IDeviceToolConfig = {
+  name: 'codeSearch',
   description: `The TagoIODocumentationSearch tool retrieves JavaScript code examples, SDK methods, and implementation guidance directly from TagoIO's documentation system. This tool searches TagoIO's knowledge base for Analysis scripts and Payload Parser examples, providing contextual code samples and best practices for specific development tasks within the TagoIO IoT platform.
 
 Use this tool when developing TagoIO Analysis scripts (serverless compute functions), creating Payload Parsers for data transformation, implementing SDK methods, or seeking code examples for specific TagoIO features. The tool is essential for developers building IoT applications who need accurate, platform-specific implementation details and working code samples.
@@ -74,9 +75,32 @@ For Payload Parser searches, the tool retrieves JavaScript decoder examples that
   }
 </example>`,
   parameters: analysisCodeBaseSchema.shape,
-  title: 'TagoIO Code Search',
+  title: 'Code Search',
   tool: analysisCodeSearchTool,
 };
 
-export { analysisCodeConfigJSON };
+/**
+ * @description Array of all analysis code search tool configurations.
+ */
+const analysisCodeSearchTools: IDeviceToolConfig[] = [codeSearchConfig];
+
+/**
+ * @description Handler for analysis code search tools to register tools in the MCP server.
+ */
+function handlerAnalysisCodeSearchTools(server: McpServer, resources: Resources) {
+  for (const toolConfig of analysisCodeSearchTools) {
+    server.tool(
+      toolConfig.name,
+      toolConfig.description,
+      toolConfig.parameters,
+      { title: toolConfig.title },
+      async (params) => {
+        const result = await toolConfig.tool(resources, params);
+        return { content: [{ type: 'text', text: result }] };
+      }
+    );
+  }
+}
+
+export { handlerAnalysisCodeSearchTools };
 export { analysisCodeBaseSchema }; //export for testing purposes

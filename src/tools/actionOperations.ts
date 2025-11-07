@@ -484,7 +484,7 @@ async function actionOperationsTool(resources: Resources, params: ActionOperatio
 }
 
 const actionOperationsConfigJSON: IDeviceToolConfig = {
-    name: 'action-operations',
+    name: 'actionOperations',
     description: `The Action-Operations tool performs CRUD operations (Create, Read, Update, Delete) on automation actions within the TagoIO platform. Actions are automated workflows that execute predefined responses when specific triggers occur, such as device data changes, resource events, scheduled intervals, or usage threshold breaches.
   
 Use this tool when you need to set up automated responses to device data changes, resource management events, scheduled operations, location-based triggers, or account usage thresholds.

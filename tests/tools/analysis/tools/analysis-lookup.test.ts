@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { analysisBaseSchema } from '../../../../src/tools/analysis/tools/analysis-operations.js';
+import { analysisBaseSchema } from '../../../../src/tools/analysisLookup.js';
 
 describe('analysisBaseSchema validation', () => {
   describe('operation validation', () => {

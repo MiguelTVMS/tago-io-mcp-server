@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { ZodError } from 'zod';
-import { analysisCodeBaseSchema } from '../../../../src/tools/documentation/tools/analysis-code.js';
+import { analysisCodeBaseSchema } from '../../../../src/tools/codeSearch.js';
 
 vi.mock('../../../../src/config.js', () => ({
   config: {

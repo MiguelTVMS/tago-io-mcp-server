@@ -1,3 +1,4 @@
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type {
   DeviceCreateInfo,
   DeviceEditInfo,
@@ -6,10 +7,10 @@ import type {
   Resources,
 } from '@tago-io/sdk';
 import { z } from 'zod';
-import { querySchema, tagsObjectModel } from '../../../utils/global-params.model';
-import { convertJSONToMarkdown } from '../../../utils/markdown';
-import { createOperationFactory } from '../../../utils/operation-factory';
-import type { IDeviceToolConfig } from '../../../types/index.js';
+import type { IDeviceToolConfig } from '../types/index.js';
+import { querySchema, tagsObjectModel } from '../utils/global-params.model.js';
+import { convertJSONToMarkdown } from '../utils/markdown.js';
+import { createOperationFactory } from '../utils/operation-factory.js';
 
 const configParamSchema = z
   .object({
@@ -454,7 +455,7 @@ async function deviceOperationsTool(resources: Resources, params: DeviceSchema) 
 }
 
 const deviceOperationsConfigJSON: IDeviceToolConfig = {
-  name: 'device-operations',
+  name: 'deviceOperations',
   description: `The DeviceOperations tool manages IoT device entities within the TagoIO platform, supporting five primary operations: lookup/list, create, update, delete, and configure. This tool handles device configuration and management rather than the data stored within devices. Each device represents an IoT endpoint that can communicate through various protocols, called Networks, including LoRaWAN, MQTT, HTTP, and REST API.
 
 Use this tool when you need to discover existing devices, provision new IoT endpoints, modify device configurations, manage configuration parameters, or remove devices from your TagoIO account.
@@ -483,5 +484,28 @@ For create operations, ensure you have connector and network IDs.
   tool: deviceOperationsTool,
 };
 
-export { deviceOperationsConfigJSON };
+/**
+ * @description Array of all device operation tool configurations.
+ */
+const devicesOperationsTools: IDeviceToolConfig[] = [deviceOperationsConfigJSON];
+
+/**
+ * @description Handler for device operations tools to register tools in the MCP server.
+ */
+function handlerDevicesOperationsTools(server: McpServer, resources: Resources) {
+  for (const toolConfig of devicesOperationsTools) {
+    server.tool(
+      toolConfig.name,
+      toolConfig.description,
+      toolConfig.parameters,
+      { title: toolConfig.title },
+      async (params) => {
+        const result = await toolConfig.tool(resources, params);
+        return { content: [{ type: 'text', text: result }] };
+      }
+    );
+  }
+}
+
+export { handlerDevicesOperationsTools };
 export { deviceBaseSchema }; // export for testing purposes

@@ -22,6 +22,6 @@ export const SERVER_INFO = {
  */
 export async function registerTools(server: McpServer, resources: Resources): Promise<void> {
     // Import tool registration dynamically to avoid circular dependencies
-    const { handlerTools } = await import('../mcp-tools.js');
+    const { handlerTools } = await import('../tools/index.js');
     await handlerTools(server, resources);
 }
