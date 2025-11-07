@@ -99,7 +99,8 @@ describe('analysisCodeBaseSchema', () => {
         type: 'invalid-type',
       };
 
-      expect(() => analysisCodeBaseSchema.parse(input)).toThrow(ZodError);
+      // biome-ignore lint/suspicious/noExplicitAny: Testing invalid input for validation
+      expect(() => analysisCodeBaseSchema.parse(input as any)).toThrow(ZodError);
     });
 
     it('should reject non-string search elements', () => {

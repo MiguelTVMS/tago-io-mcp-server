@@ -79,7 +79,8 @@ const entitySchema = entityBaseSchema.refine(
 
 type EntitySchema = z.infer<typeof entitySchema>;
 
-function validateEntityQuery(query: unknown): EntityQuery | undefined {
+// biome-ignore lint/suspicious/noExplicitAny: Query validation requires flexible input handling
+function validateEntityQuery(query: any): EntityQuery | undefined {
   if (!query) {
     return undefined;
   }

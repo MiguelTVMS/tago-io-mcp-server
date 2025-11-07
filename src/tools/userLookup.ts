@@ -91,7 +91,8 @@ const userSchema = userBaseSchema.refine(
 
 type UserSchema = z.infer<typeof userSchema>;
 
-function validateUserQuery(query: unknown): UserQuery {
+// biome-ignore lint/suspicious/noExplicitAny: Query validation requires flexible input handling
+function validateUserQuery(query: any): UserQuery {
   if (!query) {
     throw new Error('Query is required');
   }

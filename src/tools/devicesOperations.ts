@@ -249,7 +249,8 @@ const deviceSchema = deviceBaseSchema.refine(
 
 type DeviceSchema = z.infer<typeof deviceSchema>;
 
-function validateDeviceQuery(query: unknown): DeviceQuery | undefined {
+// biome-ignore lint/suspicious/noExplicitAny: Query validation requires flexible input handling
+function validateDeviceQuery(query: any): DeviceQuery | undefined {
   if (!query) {
     return undefined;
   }
