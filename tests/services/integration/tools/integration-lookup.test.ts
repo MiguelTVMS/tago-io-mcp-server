@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { integrationBaseSchema } from '../integration-lookup';
+import { integrationBaseSchema } from '../../../../src/services/integration/tools/integration-lookup.js';
 
 describe('integrationBaseSchema Parse', () => {
   describe('Query Array Validation', () => {

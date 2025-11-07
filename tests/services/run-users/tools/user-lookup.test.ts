@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ZodError } from 'zod';
-import { userBaseSchema } from '../user-lookup';
+import { userBaseSchema } from '../../../../src/services/run-users/tools/user-lookup.js';
 
 describe('userBaseSchema validation', () => {
   describe('valid inputs', () => {

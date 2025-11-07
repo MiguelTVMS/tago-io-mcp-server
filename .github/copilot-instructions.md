@@ -56,7 +56,7 @@ Reference `.env.example`. Primary variables:
 - `src/tools/` - individual MCP tool files and registration.
 - `src/prompts/` - individual MCP prompt files and registration.
 - `src/resources/` — individual MCP resource files and registration.
-- `tests/` — Unit and integration tests.
+- `tests/` — Unit and integration tests. The internal folder structure mirrors `src/` e.g. `tests/utils/logger.test.ts`.
 
 ## Development Workflow
 
@@ -88,7 +88,8 @@ Reference `.env.example`. Primary variables:
 - **ONLY** implement using client credentials mode Access processs as described in the TagoIO API documentation. The client credentials should be provided via environment variables.
 - After a tool or prompt is implemented, update the README.md file with a table of supported tools and prompts in the topic Supported TagoIO API Operations. This table should include the operationId, a brief description, and any relevant notes about the implementation. Keep it short and concise.
 - **DON'T** change anything in `node_modules` or commit any changes to that folder.
-- IMPORTANT: Encapsulate the log implementation in `src/utils/logger.ts` to allow easy modification of the logging behavior in the future. Use this logger throughout the codebase instead of direct console.log statements. The logger when in stdio mode should log only to stderr to avoid interleaving with the MCP output.
+- IMPORTANT: Encapsulate the log implementation in `src/utils/logger.ts` to allow easy modification of the logging behavior in the future. Use this logger throughout the codebase instead of direct console.log statements. The logger adapts based on the mode: when `MCP_SERVER_USE_HTTP=false` (stdio mode), logs go to stderr to avoid interleaving with the MCP output; when `MCP_SERVER_USE_HTTP=true` (HTTP mode), logs go to stdout for standard output.
 - Avoid using the TypeScript `any` type; prefer precise typings or `unknown` when necessary.
 - Any new implementation should be done in both servers, http server and stdio server, to maintain feature parity.
 - **DON'T** use `process.env.` to access environment variables directly. Access should be done outside of `src/config.ts`. All environment variables must be loaded and validated there using Zod, and then imported where needed.
+- Tests should only reside in the `tests/` folder. **DON'T** add test files alongside source files in `src/`.

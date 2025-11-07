@@ -1,6 +1,6 @@
 import type { ActionInfo } from '@tago-io/sdk';
 import { describe, expect, it } from 'vitest';
-import { convertJSONToMarkdown } from './markdown';
+import { convertJSONToMarkdown } from '../../src/utils/markdown.js';
 
 const actions: ActionInfo[] = [
   {

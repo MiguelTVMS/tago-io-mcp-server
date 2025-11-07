@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { entityBaseSchema } from '../entity-operations';
+import { entityBaseSchema } from '../../../../src/services/entities/tools/entity-operations.js';
 
 describe('entityBaseSchema', () => {
   describe('parse', () => {

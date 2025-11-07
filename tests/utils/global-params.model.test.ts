@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { genericIDSchema, querySchema } from './global-params.model';
+import { genericIDSchema, querySchema } from '../../src/utils/global-params.model.js';
 
 describe('analysisgenericIDSchema', () => {
   it('should validate valid ID', () => {
