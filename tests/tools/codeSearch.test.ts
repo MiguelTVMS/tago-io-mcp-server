@@ -96,7 +96,7 @@ describe('analysisCodeBaseSchema', () => {
     it('should reject invalid type', () => {
       const input = {
         search: ['How to create analysis?'],
-        type: 'invalid-type' as any,
+        type: 'invalid-type',
       };
 
       expect(() => analysisCodeBaseSchema.parse(input)).toThrow(ZodError);

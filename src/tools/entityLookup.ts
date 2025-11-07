@@ -79,13 +79,14 @@ const entitySchema = entityBaseSchema.refine(
 
 type EntitySchema = z.infer<typeof entitySchema>;
 
-function validateEntityQuery(query: any): EntityQuery | undefined {
+function validateEntityQuery(query: unknown): EntityQuery | undefined {
   if (!query) {
     return undefined;
   }
 
-  const amount = query.amount ?? 200;
-  const fields = query.fields ?? [
+  const queryObj = query as Record<string, unknown>;
+  const amount = queryObj.amount ?? 200;
+  const fields = queryObj.fields ?? [
     'id',
     'name',
     'schema',

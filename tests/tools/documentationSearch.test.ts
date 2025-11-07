@@ -54,9 +54,9 @@ describe('documentationBaseSchema', () => {
       const notArray = { search: 'Not an array' };
       const missingField = {};
 
-      [withNumbers, withBooleans, notArray, missingField].forEach((input) => {
+      for (const input of [withNumbers, withBooleans, notArray, missingField]) {
         expect(documentationBaseSchema.safeParse(input).success).toBe(false);
-      });
+      }
     });
   });
 

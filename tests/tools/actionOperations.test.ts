@@ -6,19 +6,19 @@ describe('actionBaseSchema Validation', () => {
     it('should accept valid operations', () => {
       const validOperations = ['create', 'update', 'delete', 'lookup'];
 
-      validOperations.forEach((operation) => {
+      for (const operation of validOperations) {
         const result = actionBaseSchema.safeParse({ operation });
         expect(result.success).toBe(true);
-      });
+      }
     });
 
     it('should reject invalid operations', () => {
       const invalidOperations = ['invalid', 'get', 'patch', ''];
 
-      invalidOperations.forEach((operation) => {
+      for (const operation of invalidOperations) {
         const result = actionBaseSchema.safeParse({ operation });
         expect(result.success).toBe(false);
-      });
+      }
     });
 
     it('should require operation field', () => {
@@ -238,7 +238,7 @@ describe('actionBaseSchema Validation', () => {
         },
       ];
 
-      triggerVariations.forEach((trigger) => {
+      for (const trigger of triggerVariations) {
         const result = actionBaseSchema.safeParse({
           operation: 'create',
           createAction: {
@@ -254,7 +254,7 @@ describe('actionBaseSchema Validation', () => {
         });
 
         expect(result.success).toBe(true);
-      });
+      }
     });
   });
 
