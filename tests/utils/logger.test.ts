@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock } from 'vitest';
 
 // Mock config with stdio mode (MCP_SERVER_USE_HTTP=false)
-vi.mock('../src/config.js', () => ({
+vi.mock('../../src/config.js', () => ({
     config: {
         MCP_SERVER_LOG_LEVEL: 'debug',
         MCP_SERVER_LOG_FORMAT: 'json',
@@ -30,7 +30,7 @@ describe('Logger', () => {
 
     describe('log levels', () => {
         it('should log debug messages', async () => {
-            const { logger } = await import('../src/utils/logger.js');
+            const { logger } = await import('../../src/utils/logger.js');
 
             logger.debug('Debug message');
 
@@ -41,7 +41,7 @@ describe('Logger', () => {
         });
 
         it('should log info messages', async () => {
-            const { logger } = await import('../src/utils/logger.js');
+            const { logger } = await import('../../src/utils/logger.js');
 
             logger.info('Info message');
 
@@ -51,7 +51,7 @@ describe('Logger', () => {
         });
 
         it('should log warn messages', async () => {
-            const { logger } = await import('../src/utils/logger.js');
+            const { logger } = await import('../../src/utils/logger.js');
 
             logger.warn('Warning message');
 
@@ -61,7 +61,7 @@ describe('Logger', () => {
         });
 
         it('should log error messages', async () => {
-            const { logger } = await import('../src/utils/logger.js');
+            const { logger } = await import('../../src/utils/logger.js');
 
             logger.error('Error message');
 
@@ -73,7 +73,7 @@ describe('Logger', () => {
 
     describe('context and error handling', () => {
         it('should log with context', async () => {
-            const { logger } = await import('../src/utils/logger.js');
+            const { logger } = await import('../../src/utils/logger.js');
 
             logger.info('Message with context', { userId: '123', action: 'create' });
 
@@ -85,7 +85,7 @@ describe('Logger', () => {
         });
 
         it('should log error objects', async () => {
-            const { logger } = await import('../src/utils/logger.js');
+            const { logger } = await import('../../src/utils/logger.js');
             const error = new Error('Test error');
 
             logger.error('Error occurred', error);
@@ -98,7 +98,7 @@ describe('Logger', () => {
         });
 
         it('should log error with context', async () => {
-            const { logger } = await import('../src/utils/logger.js');
+            const { logger } = await import('../../src/utils/logger.js');
             const error = new Error('Test error');
 
             logger.error('Error occurred', error, { operation: 'delete' });
@@ -110,7 +110,7 @@ describe('Logger', () => {
         });
 
         it('should handle errorMessage convenience method', async () => {
-            const { logger } = await import('../src/utils/logger.js');
+            const { logger } = await import('../../src/utils/logger.js');
 
             logger.errorMessage('Simple error');
 
@@ -122,7 +122,7 @@ describe('Logger', () => {
 
     describe('stdio mode (MCP_SERVER_USE_HTTP=false)', () => {
         it('should write to stderr in stdio mode', async () => {
-            const { logger } = await import('../src/utils/logger.js');
+            const { logger } = await import('../../src/utils/logger.js');
 
             logger.info('Test message');
 
@@ -132,7 +132,7 @@ describe('Logger', () => {
         });
 
         it('should write all log levels to stderr', async () => {
-            const { logger } = await import('../src/utils/logger.js');
+            const { logger } = await import('../../src/utils/logger.js');
 
             logger.debug('Debug');
             logger.info('Info');
@@ -176,7 +176,7 @@ describe('Logger - HTTP Mode', () => {
 
     describe('HTTP mode (MCP_SERVER_USE_HTTP=true)', () => {
         it('should write to stdout in HTTP mode', async () => {
-            const { logger } = await import('../src/utils/logger.js');
+            const { logger } = await import('../../src/utils/logger.js');
 
             logger.info('Test message');
 
@@ -187,7 +187,7 @@ describe('Logger - HTTP Mode', () => {
         });
 
         it('should write all log levels to stdout', async () => {
-            const { logger } = await import('../src/utils/logger.js');
+            const { logger } = await import('../../src/utils/logger.js');
 
             logger.debug('Debug');
             logger.info('Info');
@@ -224,7 +224,7 @@ describe('Logger - Log Formats', () => {
                 },
             }));
 
-            const { logger } = await import('../src/utils/logger.js');
+            const { logger } = await import('../../src/utils/logger.js');
             logger.info('Test message');
 
             expect(stderrWriteSpy).toHaveBeenCalled();
@@ -249,7 +249,7 @@ describe('Logger - Log Formats', () => {
                 },
             }));
 
-            const { logger } = await import('../src/utils/logger.js');
+            const { logger } = await import('../../src/utils/logger.js');
             logger.warn('Warning message');
 
             expect(stderrWriteSpy).toHaveBeenCalled();
@@ -269,7 +269,7 @@ describe('Logger - Log Formats', () => {
                 },
             }));
 
-            const { logger } = await import('../src/utils/logger.js');
+            const { logger } = await import('../../src/utils/logger.js');
 
             logger.debug('Debug');
             logger.info('Info');
@@ -311,7 +311,7 @@ describe('Logger - Log Levels', () => {
             },
         }));
 
-        const { logger } = await import('../src/utils/logger.js');
+        const { logger } = await import('../../src/utils/logger.js');
 
         logger.debug('Debug message'); // Should not log
         logger.info('Info message');   // Should log
@@ -331,7 +331,7 @@ describe('Logger - Log Levels', () => {
             },
         }));
 
-        const { logger } = await import('../src/utils/logger.js');
+        const { logger } = await import('../../src/utils/logger.js');
 
         logger.debug('Debug message'); // Should not log
         logger.info('Info message');   // Should not log
@@ -351,7 +351,7 @@ describe('Logger - Log Levels', () => {
             },
         }));
 
-        const { logger } = await import('../src/utils/logger.js');
+        const { logger } = await import('../../src/utils/logger.js');
 
         logger.debug('Debug message'); // Should not log
         logger.info('Info message');   // Should not log

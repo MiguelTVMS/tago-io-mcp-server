@@ -1,62 +1,35 @@
 #!/usr/bin/env node
 
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { Resources } from '@tago-io/sdk';
+import { config } from './config.js';
+import { logger } from './utils/logger.js';
 
-import { config } from './config';
-import { handlerTools } from './mcp-tools';
-import { logger } from './utils/logger';
-
+// Enable MCP logging in development mode
 if (config.NODE_ENV === 'development') {
   void import('mcps-logger/console');
 }
 
 /**
- * @description Start the MCP server using stdio transport.
+ * Main entry point for the MCP server.
+ * Routes to the appropriate server implementation based on configuration.
  */
-async function startServer() {
+async function main(): Promise<void> {
   try {
-    // Validate required environment variables
-    if (!config.TAGOIO_TOKEN) {
-      logger.error('TAGOIO_TOKEN environment variable is required');
-      process.exit(1);
+    logger.debug('Starting MCP server');
+    logger.debug(`Mode: ${config.MCP_SERVER_USE_HTTP ? 'HTTP' : 'stdio'}`);
+
+    if (config.MCP_SERVER_USE_HTTP) {
+      // Start HTTP/SSE server
+      const { startHttpServer } = await import('./server/http.js');
+      await startHttpServer();
+    } else {
+      // Start stdio server (default)
+      const { startStdioServer } = await import('./server/stdio.js');
+      await startStdioServer();
     }
-
-    // Set the TagoIO API endpoint
-    process.env.TAGOIO_API = config.TAGOIO_API;
-
-    // Initialize TagoIO Resources with the token
-    const resources = new Resources({ token: config.TAGOIO_TOKEN });
-
-    // Validate the connection to TagoIO API
-    await resources.account.info().catch(() => {
-      throw new Error(
-        'Failed to connect to TagoIO API. Please check your TAGOIO_TOKEN and TAGOIO_API configuration.'
-      );
-    });
-
-    // Create MCP server
-    const mcpServer = new McpServer({
-      name: 'middleware-mcp-tagoio',
-      version: '1.0.0',
-    });
-
-    // Register all tools
-    await handlerTools(mcpServer, resources);
-
-    // Create stdio transport
-    const transport = new StdioServerTransport();
-
-    // Connect server to transport
-    await mcpServer.connect(transport);
-
-    logger.debug('MCP server started successfully with stdio transport');
-    logger.debug('Tools registered and ready to receive requests');
   } catch (error) {
     logger.error('Failed to start MCP server', error instanceof Error ? error : undefined);
     process.exit(1);
   }
 }
 
-void startServer();
+void main();

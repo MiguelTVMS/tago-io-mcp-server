@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { environmentModel, headersModel } from '../../src/utils/config.model.js';
+import { environmentModel, headersModel } from '../../src/../src/utils/config.model.js';
 
 // Helper to create a valid base object for environment
 const defaultEnv = {
