@@ -1,9 +1,10 @@
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { Resources } from '@tago-io/sdk';
 import { z } from 'zod';
 
 import type { SecretsQuery } from '@tago-io/sdk';
-import { convertJSONToMarkdown } from '../../../utils/markdown';
-import type { IDeviceToolConfig } from '../../../types/index.js';
+import type { IDeviceToolConfig } from '../types/index.js';
+import { convertJSONToMarkdown } from '../utils/markdown.js';
 
 const profileLookupSchema = z.object({
   operation: z
@@ -81,8 +82,8 @@ async function profileLookupTool(resources: Resources, params: ProfileLookupSche
   return markdownResponse;
 }
 
-const profileLookupConfigJSON: IDeviceToolConfig = {
-  name: 'profile-lookup',
+const profileLookupConfig: IDeviceToolConfig = {
+  name: 'profileLookup',
   description: `Get profile information or list secrets based on the operation parameter.
 - Use 'profile_info' to get current profile details
 - Use 'secrets_list' to retrieve profile secrets with optional filtering by id/key, ordering, and pagination`,
@@ -91,4 +92,30 @@ const profileLookupConfigJSON: IDeviceToolConfig = {
   tool: profileLookupTool,
 };
 
-export { profileLookupConfigJSON, profileLookupSchema };
+/**
+ * @description Array of all profile lookup tool configurations.
+ * Each tool configuration follows the IDeviceToolConfig interface structure
+ * and will be automatically registered in the MCP server.
+ */
+const profileLookupTools: IDeviceToolConfig[] = [profileLookupConfig];
+
+/**
+ * @description Handler for profile lookup tools to register tools in the MCP server.
+ */
+function handlerProfileLookupTools(server: McpServer, resources: Resources) {
+  for (const toolConfig of profileLookupTools) {
+    server.tool(
+      toolConfig.name,
+      toolConfig.description,
+      toolConfig.parameters,
+      { title: toolConfig.title },
+      async (params) => {
+        const result = await toolConfig.tool(resources, params);
+        return { content: [{ type: 'text', text: result }] };
+      }
+    );
+  }
+}
+
+export { handlerProfileLookupTools };
+export { profileLookupSchema };

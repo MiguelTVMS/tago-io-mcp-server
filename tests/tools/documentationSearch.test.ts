@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { documentationBaseSchema } from '../../../../src/tools/documentationSearch.js';
+import { documentationBaseSchema } from '../../src/tools/documentationSearch.js';
 
-vi.mock('../../../../src/config.js', () => ({
+vi.mock('../../src/config.js', () => ({
   config: {
     TAGOIO_TOKEN: 'test',
     TEST: 'true',

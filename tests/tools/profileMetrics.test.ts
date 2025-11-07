@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { profileMetricsSchema } from '../../../../src/tools/profile/tools/profile-metrics.js';
+import { profileMetricsSchema } from '../../src/tools/profileMetrics.js';
 
 describe('Profile Metrics Tool', () => {
   describe('profileMetricsSchema', () => {

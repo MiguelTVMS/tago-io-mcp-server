@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { ZodError } from 'zod';
-import { analysisCodeBaseSchema } from '../../../../src/tools/codeSearch.js';
+import { analysisCodeBaseSchema } from '../../src/tools/codeSearch.js';
 
-vi.mock('../../../../src/config.js', () => ({
+vi.mock('../../src/config.js', () => ({
   config: {
     TAGOIO_TOKEN: 'test',
     TEST: 'true',

@@ -4,14 +4,15 @@ import type { Resources } from '@tago-io/sdk';
 import { handlerActionsTools } from './actionOperations.js';
 import { handlerAnalysesTools } from './analysisLookup.js';
 import { handlerAnalysisCodeSearchTools } from './codeSearch.js';
+import { handlerConnectorNetworkLookupTools } from './connectorNetworkLookup.js';
 import { handlerDeviceDataOperationsTools } from './deviceDataOperations.js';
 import { handlerDeviceDeleteDataTools } from './deviceDeleteData.js';
 import { handlerDevicesOperationsTools } from './devicesOperations.js';
 import { handlerDocumentationSearchTools } from './documentationSearch.js';
-import { handlerEntitiesTools } from './entities/index.js';
-import { handlerIntegrationTools } from './integration/index.js';
-import { handlerProfileMetricsTools } from './profile/index.js';
-import { handlerUsersTools } from './run-users/index.js';
+import { handlerEntityLookupTools } from './entityLookup.js';
+import { handlerProfileLookupTools } from './profileLookup.js';
+import { handlerProfileMetricsTools } from './profileMetrics.js';
+import { handlerUserLookupTools } from './userLookup.js';
 
 /**
  * @description Register tools for the MCP server.
@@ -30,13 +31,15 @@ async function handlerTools(server: McpServer, resources: Resources) {
   // Tools for TagoIO device delete data
   handlerDeviceDeleteDataTools(server, resources);
   // Tools for TagoIO entities
-  handlerEntitiesTools(server, resources);
+  handlerEntityLookupTools(server, resources);
   // Tools for TagoIO users
-  handlerUsersTools(server, resources);
+  handlerUserLookupTools(server, resources);
+  // Tools for TagoIO profile lookup
+  handlerProfileLookupTools(server, resources);
   // Tools for TagoIO profile metrics
   handlerProfileMetricsTools(server, resources);
-  // Tools for TagoIO integration
-  handlerIntegrationTools(server, resources);
+  // Tools for TagoIO connector network lookup
+  handlerConnectorNetworkLookupTools(server, resources);
   // Tools for TagoIO documentation search
   handlerDocumentationSearchTools(server, resources);
 }

@@ -1,12 +1,13 @@
 // Note: UserQuery SDK type may have type issues causing unsafe operation warnings
 
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { Resources } from '@tago-io/sdk';
 import type { UserQuery } from '@tago-io/sdk';
 import { z } from 'zod';
-import { querySchema, tagsObjectModel } from '../../../utils/global-params.model';
-import { convertJSONToMarkdown } from '../../../utils/markdown';
-import { createOperationFactory } from '../../../utils/operation-factory';
-import type { IDeviceToolConfig } from '../../../types/index.js';
+import type { IDeviceToolConfig } from '../types/index.js';
+import { querySchema, tagsObjectModel } from '../utils/global-params.model.js';
+import { convertJSONToMarkdown } from '../utils/markdown.js';
+import { createOperationFactory } from '../utils/operation-factory.js';
 
 const userListSchema = querySchema.extend({
   filter: z
@@ -149,7 +150,7 @@ async function userOperationsTool(resources: Resources, params: UserSchema) {
 }
 
 const userLookupConfigJSON: IDeviceToolConfig = {
-  name: 'run-user-lookup',
+  name: 'userLookup',
   description: `The TagoRunUserLookup tool searches and retrieves user information from TagoRUN, TagoIO's limited-access portal designed for end-users with customizable branding and restricted functionality.
 
 Use this tool when you need to find specific TagoRUN users by name or tags, retrieve user account information for access management, discover existing users in your TagoRUN environment, or obtain user details for permission and branding configuration. 
@@ -170,5 +171,30 @@ Use this tool when you need to find specific TagoRUN users by name or tags, retr
   tool: userOperationsTool,
 };
 
-export { userLookupConfigJSON };
+/**
+ * @description Array of all user lookup tool configurations.
+ * Each tool configuration follows the IDeviceToolConfig interface structure
+ * and will be automatically registered in the MCP server.
+ */
+const userLookupTools: IDeviceToolConfig[] = [userLookupConfigJSON];
+
+/**
+ * @description Handler for user lookup tools to register tools in the MCP server.
+ */
+function handlerUserLookupTools(server: McpServer, resources: Resources) {
+  for (const toolConfig of userLookupTools) {
+    server.tool(
+      toolConfig.name,
+      toolConfig.description,
+      toolConfig.parameters,
+      { title: toolConfig.title },
+      async (params) => {
+        const result = await toolConfig.tool(resources, params);
+        return { content: [{ type: 'text', text: result }] };
+      }
+    );
+  }
+}
+
+export { handlerUserLookupTools };
 export { userBaseSchema }; // export for testing purposes

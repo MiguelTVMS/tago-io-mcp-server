@@ -1,13 +1,14 @@
 // Note: EntityQuery SDK type is reported as an "error" type by TypeScript
 // This causes cascading unsafe operation warnings throughout this file
 
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { Resources } from '@tago-io/sdk';
 import type { EntityQuery } from '@tago-io/sdk';
 import { z } from 'zod';
-import { querySchema, tagsObjectModel } from '../../../utils/global-params.model';
-import { convertJSONToMarkdown } from '../../../utils/markdown';
-import { createOperationFactory } from '../../../utils/operation-factory';
-import type { IDeviceToolConfig } from '../../../types/index.js';
+import type { IDeviceToolConfig } from '../types/index.js';
+import { querySchema, tagsObjectModel } from '../utils/global-params.model.js';
+import { convertJSONToMarkdown } from '../utils/markdown.js';
+import { createOperationFactory } from '../utils/operation-factory.js';
 
 const entityListSchema = querySchema.extend({
   filter: z
@@ -131,8 +132,8 @@ async function entityOperationsTool(resources: Resources, params: EntitySchema) 
   return factory.execute(validatedParams);
 }
 
-const entityOperationsConfigJSON: IDeviceToolConfig = {
-  name: 'entity-operations',
+const entityLookupConfig: IDeviceToolConfig = {
+  name: 'entityLookup',
   description: `The EntityLookup tool searches and retrieves entities from TagoIO's next-generation database system. Entities represent TagoIO's advanced database solution that replaces Mutable Devices for complex data structures, offering customizable database tables with flexible schemas, advanced querying capabilities, and enhanced performance for structured data operations. This tool enables discovery and retrieval of entity metadata and configurations.
 
 Use this tool when you need to find specific entities by name or tags, retrieve entity configurations and schemas, discover available entities in your TagoIO environment, or obtain entity IDs for subsequent operations. This tool is essential for entity management workflows, data structure discovery, and when building applications that interact with TagoIO's entity-based data storage system.
@@ -158,5 +159,30 @@ Do not use this tool for creating, updating, or deleting entities, as it perform
   tool: entityOperationsTool,
 };
 
-export { entityOperationsConfigJSON };
+/**
+ * @description Array of all entity tool configurations.
+ * Each tool configuration follows the IDeviceToolConfig interface structure
+ * and will be automatically registered in the MCP server.
+ */
+const entityTools: IDeviceToolConfig[] = [entityLookupConfig];
+
+/**
+ * @description Handler for entity tools to register tools in the MCP server.
+ */
+function handlerEntityLookupTools(server: McpServer, resources: Resources) {
+  for (const toolConfig of entityTools) {
+    server.tool(
+      toolConfig.name,
+      toolConfig.description,
+      toolConfig.parameters,
+      { title: toolConfig.title },
+      async (params) => {
+        const result = await toolConfig.tool(resources, params);
+        return { content: [{ type: 'text', text: result }] };
+      }
+    );
+  }
+}
+
+export { handlerEntityLookupTools };
 export { entityBaseSchema }; // export for testing purposes

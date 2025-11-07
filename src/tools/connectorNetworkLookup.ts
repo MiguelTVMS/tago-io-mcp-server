@@ -1,12 +1,13 @@
 // Note: NetworkQuery and ConnectorQuery SDK types are reported as "error" types by TypeScript
 // This causes cascading unsafe operation warnings throughout this file
 
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { Resources } from '@tago-io/sdk';
 import type { NetworkQuery } from '@tago-io/sdk';
 import type { ConnectorQuery } from '@tago-io/sdk';
 import { z } from 'zod';
-import { convertJSONToMarkdown } from '../../../utils/markdown';
-import type { IDeviceToolConfig } from '../../../types/index.js';
+import type { IDeviceToolConfig } from '../types/index.js';
+import { convertJSONToMarkdown } from '../utils/markdown.js';
 
 const integrationQuerySchema = z.object({
   type: z
@@ -128,9 +129,9 @@ async function integrationOperationsTool(resources: Resources, params: Integrati
   return results.join('\n\n');
 }
 
-const integrationLookupConfigJSON: IDeviceToolConfig = {
-  name: 'connector-network-lookup',
-  description: `The ConnectorNetworkLookup tool retrieves connector and network information from the TagoIO platform using either ID or name-based searches. This tool queries the TagoIO database to find specific connectors (pre-defined data decoders) and networks (communication protocol or integrations) that facilitate device connectivity and data transmission within the IoT platform.
+const connectorNetworkLookupConfig: IDeviceToolConfig = {
+  name: 'connectorNetworkLookup',
+  description: `The connectorNetworkLookup tool retrieves connector and network information from the TagoIO platform using either ID or name-based searches. This tool queries the TagoIO database to find specific connectors (pre-defined data decoders) and networks (communication protocol or integrations) that facilitate device connectivity and data transmission within the IoT platform.
   
 The query parameter accepts an array of query objects. Each object must specify a "type" (connector or network) and either an "id" or "name" for lookup. The "public" field can optionally filter results by privacy status. You can query multiple resources in a single request by providing multiple objects in the array.
 
@@ -158,5 +159,30 @@ When looking up a list of connectors or networks, ALWAYS inform the user that th
   tool: integrationOperationsTool,
 };
 
-export { integrationLookupConfigJSON };
+/**
+ * @description Array of all connector network tool configurations.
+ * Each tool configuration follows the IDeviceToolConfig interface structure
+ * and will be automatically registered in the MCP server.
+ */
+const connectorNetworkTools: IDeviceToolConfig[] = [connectorNetworkLookupConfig];
+
+/**
+ * @description Handler for connector network tools to register tools in the MCP server.
+ */
+function handlerConnectorNetworkLookupTools(server: McpServer, resources: Resources) {
+  for (const toolConfig of connectorNetworkTools) {
+    server.tool(
+      toolConfig.name,
+      toolConfig.description,
+      toolConfig.parameters,
+      { title: toolConfig.title },
+      async (params) => {
+        const result = await toolConfig.tool(resources, params);
+        return { content: [{ type: 'text', text: result }] };
+      }
+    );
+  }
+}
+
+export { handlerConnectorNetworkLookupTools };
 export { integrationBaseSchema }; // export for testing purposes

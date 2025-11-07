@@ -1,10 +1,11 @@
+import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { Resources } from '@tago-io/sdk';
 import { z } from 'zod';
 
 import type { ProfileSummary } from '@tago-io/sdk';
-import { getProfileID } from '../../../utils/get-profile-id';
-import { convertJSONToMarkdown } from '../../../utils/markdown';
-import type { IDeviceToolConfig } from '../../../types/index.js';
+import type { IDeviceToolConfig } from '../types/index.js';
+import { getProfileID } from '../utils/get-profile-id.js';
+import { convertJSONToMarkdown } from '../utils/markdown.js';
 
 const profileMetricsSchema = z.object({
   type: z
@@ -104,7 +105,7 @@ E-mails / SMS / Push Notification: Number of messages sent`;
 }
 
 const profileMetricsConfigJSON: IDeviceToolConfig = {
-  name: 'profile-metrics',
+  name: 'profileMetrics',
   description: `Get profile resource limits or usage statistics, depending on the 'type' parameter. 
 For statistics, you can optionally provide a 'statisticsQuery' object with date range (start_date, end_date) and periodicity (day, month, year) parameters.
 For time-based queries, use the current date/time reference: ${new Date().toLocaleDateString()}`,
@@ -113,4 +114,30 @@ For time-based queries, use the current date/time reference: ${new Date().toLoca
   tool: profileMetricsTool,
 };
 
-export { profileMetricsConfigJSON, profileMetricsSchema };
+/**
+ * @description Array of all profile metrics tool configurations.
+ * Each tool configuration follows the IDeviceToolConfig interface structure
+ * and will be automatically registered in the MCP server.
+ */
+const profileMetricsTools: IDeviceToolConfig[] = [profileMetricsConfigJSON];
+
+/**
+ * @description Handler for profile metrics tools to register tools in the MCP server.
+ */
+function handlerProfileMetricsTools(server: McpServer, resources: Resources) {
+  for (const toolConfig of profileMetricsTools) {
+    server.tool(
+      toolConfig.name,
+      toolConfig.description,
+      toolConfig.parameters,
+      { title: toolConfig.title },
+      async (params) => {
+        const result = await toolConfig.tool(resources, params);
+        return { content: [{ type: 'text', text: result }] };
+      }
+    );
+  }
+}
+
+export { handlerProfileMetricsTools };
+export { profileMetricsSchema };
