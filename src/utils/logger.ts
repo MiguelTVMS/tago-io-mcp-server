@@ -69,7 +69,7 @@ function createPinoLogger() {
         },
         timestamp: pino.stdTimeFunctions.isoTime,
       },
-      outputStream,
+      outputStream
     );
   }
 
