@@ -7,44 +7,44 @@ import type { ZodRawShape } from 'zod';
  * that are used to register tools in the MCP server.
  */
 interface IToolConfig {
-    /**
-     * Unique identifier for the tool.
-     * This name will be used to register the tool in the MCP server.
-     * @example "get-device-list"
-     */
-    name: string;
+  /**
+   * Unique identifier for the tool.
+   * This name will be used to register the tool in the MCP server.
+   * @example "get-device-list"
+   */
+  name: string;
 
-    /**
-     * Human-readable description of what the tool does.
-     * This description will be shown to users when they interact with the tool.
-     * @example "Get a list of devices"
-     */
-    description: string;
+  /**
+   * Human-readable description of what the tool does.
+   * This description will be shown to users when they interact with the tool.
+   * @example "Get a list of devices"
+   */
+  description: string;
 
-    /**
-     * Zod schema object that defines the parameters the tool accepts.
-     * This should be a raw shape object compatible with server.tool from MCP SDK.
-     * @example { deviceID: z.string().describe("Device ID") }
-     */
-    parameters: ZodRawShape;
+  /**
+   * Zod schema object that defines the parameters the tool accepts.
+   * This should be a raw shape object compatible with server.tool from MCP SDK.
+   * @example { deviceID: z.string().describe("Device ID") }
+   */
+  parameters: ZodRawShape;
 
-    /**
-     * Display title for the tool in user interfaces.
-     * @example "Get Device List"
-     */
-    title: string;
+  /**
+   * Display title for the tool in user interfaces.
+   * @example "Get Device List"
+   */
+  title: string;
 
-    /**
-     * The actual function that implements the tool's functionality.
-     * This function receives the TagoIO Resources instance and the parsed parameters,
-     * and should return a string (usually Markdown-formatted) response.
-     *
-     * @param resources - TagoIO SDK Resources instance for API calls
-     * @param params - Parsed and validated parameters from the Zod schema
-     * @returns Promise that resolves to a string response (usually Markdown)
-     */
-    // biome-ignore lint/suspicious/noExplicitAny: Tool params can have various shapes based on Zod schema
-    tool: (resources: Resources, params: any) => Promise<string>;
+  /**
+   * The actual function that implements the tool's functionality.
+   * This function receives the TagoIO Resources instance and the parsed parameters,
+   * and should return a string (usually Markdown-formatted) response.
+   *
+   * @param resources - TagoIO SDK Resources instance for API calls
+   * @param params - Parsed and validated parameters from the Zod schema
+   * @returns Promise that resolves to a string response (usually Markdown)
+   */
+  // biome-ignore lint/suspicious/noExplicitAny: Tool params can have various shapes based on Zod schema
+  tool: (resources: Resources, params: any) => Promise<string>;
 }
 
 /**

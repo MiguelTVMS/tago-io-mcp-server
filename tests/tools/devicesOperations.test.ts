@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ZodError } from 'zod';
-import { deviceBaseSchema } from '../../../../src/tools/devicesOperations.js';
+import { deviceBaseSchema } from '../../src/tools/devicesOperations.js';
 
 describe('deviceBaseSchema', () => {
   describe('Operation Validation', () => {

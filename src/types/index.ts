@@ -1,6 +1,6 @@
 /**
  * Centralized type definitions for the MCP server.
- * 
+ *
  * This module exports all type definitions used throughout the application:
  * - JSON-RPC types for MCP protocol communication
  * - Tool configuration interfaces

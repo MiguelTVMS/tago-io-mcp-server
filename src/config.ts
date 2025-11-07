@@ -16,12 +16,8 @@ const tagoioConfigSchema = z.object({
  * MCP Generic Server Configuration Schema
  */
 const mcpServerConfigSchema = z.object({
-  MCP_SERVER_LOG_LEVEL: z
-    .enum(['debug', 'info', 'warn', 'error'])
-    .default('info'),
-  MCP_SERVER_LOG_FORMAT: z
-    .enum(['plain', 'json', 'gcp-json'])
-    .default('plain'),
+  MCP_SERVER_LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
+  MCP_SERVER_LOG_FORMAT: z.enum(['plain', 'json', 'gcp-json']).default('plain'),
   MCP_SERVER_USE_HTTP: z
     .string()
     .transform((val) => val === 'true')
@@ -40,7 +36,7 @@ const mcpServerConfigSchema = z.object({
 const mcpHttpConfigSchema = z.object({
   MCP_HTTP_PORT: z
     .string()
-    .transform((val) => parseInt(val, 10))
+    .transform((val) => Number.parseInt(val, 10))
     .pipe(z.number().int().positive())
     .default('3000'),
   MCP_HTTP_HOST: z.string().default('0.0.0.0'),
