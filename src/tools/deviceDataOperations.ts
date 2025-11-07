@@ -216,13 +216,14 @@ const querySchema = z.object({
 });
 
 // Query validation utility
-function validateDeviceDataQuery(query: any): DataQuery | undefined {
+function validateDeviceDataQuery(query: unknown): DataQuery | undefined {
   if (!query) {
     return undefined;
   }
 
-  if (query.query === 'conditional') {
-    const { start_date, value, function: fn } = query;
+  const queryObj = query as Record<string, unknown>;
+  if (queryObj.query === 'conditional') {
+    const { start_date, value, function: fn } = queryObj;
     if (typeof start_date === 'string' && typeof value === 'number' && typeof fn === 'string') {
       return query;
     }
@@ -231,8 +232,8 @@ function validateDeviceDataQuery(query: any): DataQuery | undefined {
     );
   }
 
-  if (query.query === 'aggregate') {
-    const { interval, function: fn } = query;
+  if (queryObj.query === 'aggregate') {
+    const { interval, function: fn } = queryObj;
     if (typeof interval === 'string' && typeof fn === 'string') {
       return query;
     }
@@ -241,7 +242,7 @@ function validateDeviceDataQuery(query: any): DataQuery | undefined {
     );
   }
   // For all other queries, return as is
-  return query;
+  return queryObj as DataQuery;
 }
 
 // Base schema without refinement - this provides the .shape property needed by MCP

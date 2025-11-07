@@ -91,13 +91,14 @@ const userSchema = userBaseSchema.refine(
 
 type UserSchema = z.infer<typeof userSchema>;
 
-function validateUserQuery(query: any): UserQuery {
+function validateUserQuery(query: unknown): UserQuery {
   if (!query) {
     throw new Error('Query is required');
   }
 
-  const amount = query.amount ?? 200;
-  const fields = query.fields ?? [
+  const queryObj = query as Record<string, unknown>;
+  const amount = queryObj.amount ?? 200;
+  const fields = queryObj.fields ?? [
     'id',
     'name',
     'email',

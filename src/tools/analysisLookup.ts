@@ -1,5 +1,5 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import type { Resources } from '@tago-io/sdk';
+import type { AnalysisQuery, Resources } from '@tago-io/sdk';
 import { z } from 'zod';
 import type { IDeviceToolConfig } from '../types/index.js';
 import { querySchema, tagsObjectModel } from '../utils/global-params.model.js';
@@ -83,13 +83,14 @@ const analysisSchema = analysisBaseSchema.refine(
 
 type AnalysisSchema = z.infer<typeof analysisSchema>;
 
-function validateAnalysisQuery(query: any): any {
+function validateAnalysisQuery(query: unknown): AnalysisQuery | undefined {
   if (!query) {
     return undefined;
   }
 
-  const amount = (query.amount as number) ?? 200;
-  let fields = (query.fields as string[]) ?? [
+  const queryObj = query as Record<string, unknown>;
+  const amount = (queryObj.amount as number) ?? 200;
+  let fields = (queryObj.fields as string[]) ?? [
     'id',
     'active',
     'name',
@@ -103,15 +104,15 @@ function validateAnalysisQuery(query: any): any {
     'run_on',
   ];
 
-  if (query.include_console as boolean) {
+  if (queryObj.include_console as boolean) {
     fields = (fields ?? []).concat(['console']);
   }
 
   return {
     amount,
     fields,
-    ...query,
-  };
+    ...queryObj,
+  } as AnalysisQuery;
 }
 
 // Operation handlers
