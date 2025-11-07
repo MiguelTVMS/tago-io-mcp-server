@@ -249,12 +249,13 @@ const deviceSchema = deviceBaseSchema.refine(
 
 type DeviceSchema = z.infer<typeof deviceSchema>;
 
-function validateDeviceQuery(query: any): DeviceQuery | undefined {
+function validateDeviceQuery(query: unknown): DeviceQuery | undefined {
   if (!query) {
     return undefined;
   }
 
-  const amount = query.amount ?? 200;
+  const queryObj = query as Record<string, unknown>;
+  const amount = (queryObj.amount as number) ?? 200;
 
   return {
     amount,
@@ -269,8 +270,8 @@ function validateDeviceQuery(query: any): DeviceQuery | undefined {
       'created_at',
       'updated_at',
     ],
-    ...query,
-  };
+    ...queryObj,
+  } as DeviceQuery;
 }
 
 // Operation handlers

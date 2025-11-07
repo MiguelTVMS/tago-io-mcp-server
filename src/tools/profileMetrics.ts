@@ -81,7 +81,7 @@ async function profileMetricsTool(resources: Resources, params: ProfileMetricsSc
     const hasOptions = Object.keys(options).length > 0;
 
     data = await resources.profiles
-      .usageStatisticList(profileID, hasOptions ? (options as any) : undefined)
+      .usageStatisticList(profileID, hasOptions ? (options as Record<string, string>) : undefined)
       .catch((error) => {
         throw new Error(`**Error fetching profile statistics:** ${error}`);
       });
