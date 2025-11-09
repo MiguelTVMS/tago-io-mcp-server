@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { actionBaseSchema } from '../../../src/tools/actionOperations.js';
+import { actionBaseSchema } from '../../src/tools/actionOperations.js';
 
 describe('actionBaseSchema Validation', () => {
   describe('Operation validation', () => {

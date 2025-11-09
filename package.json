@@ -13,6 +13,7 @@
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
     "check": "biome check . && tsc --noEmit",
+    "test": "vitest",
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
     "docker:build": "docker build -t tago-mcp-server:latest .",
