@@ -34,15 +34,15 @@ Reference `.env.example`. Primary variables:
 
 ### MCP Server HTTP Configuration, if `MCP_SERVER_USE_HTTP` is `true`
 
-- `MCP_HTTP_PORT` (default: `3000`) - port for the HTTP/SSE server.
-- `MCP_HTTP_HOST` (default: `0.0.0.0`) - host for the HTTP/SSE server.
-- `MCP_HTTP_PATH` (default: `/mcp`) - base path for MCP HTTP endpoints.
+- `MCP_HTTP_TRANSPORT` (default: `stream`) - HTTP transport protocol (`stream` for Streamable HTTP per MCP 2025-06-18 spec, `sse` for Server-Sent Events per MCP 2024-11-05 spec).
+- `MCP_HTTP_PORT` (default: `3000`) - port for the HTTP server.
+- `MCP_HTTP_PATH` - base path for MCP HTTP endpoints. Defaults to `/mcp` for `stream` transport and `/sse` for `sse` transport if not specified.
+- `MCP_HTTP_BIND_ADDR` (default: `127.0.0.1`) - network bind address (IPv4 or IPv6) for security. Defaults to loopback for local-only access.
 - `MCP_HTTP_ENABLE_HEALTHCHECK` (default: `true`) - enable a healthcheck endpoint at the path indicated on `MCP_HTTP_HEALTHCHECK_PATH`.
 - `MCP_HTTP_HEALTHCHECK_PATH` (default: `/healthz`) - path for the healthcheck endpoint.
 - `MCP_HTTP_ALLOW_CORS` (default: `true`) - enable CORS for the HTTP server.
-- `MCP_HTTP_ALLOWED_HOSTS` (optional) - comma-separated list of allowed hosts for requests.
-- `MCP_HTTP_ALLOWED_ORIGINS` (optional) - comma-separated list of allowed origins for CORS.
-- `MCP_HTTP_NGROK_ENABLED` (default: `false`) - whether to use ngrok to expose the HTTP server publicly.
+- `MCP_HTTP_ALLOWED_ORIGINS` (default: `127.0.0.1,localhost`) - comma-separated list of allowed origins for DNS rebinding protection. Must be valid hostnames, IPv4, or IPv6 addresses. Use `*` to allow any origin (NOT recommended for production). Required for security.
+- `MCP_HTTP_NGROK_ENABLED` (default: `false`) - whether to use ngrok to expose the HTTP server publicly. Works with both `stream` and `sse` transports.
 - `MCP_HTTP_NGROK_AUTH_TOKEN` (optional) - ngrok auth token, required if `MCP_HTTP_NGROK_ENABLED` is `true`.
 
 ## Code Structure
@@ -51,7 +51,12 @@ Reference `.env.example`. Primary variables:
 - `src/config.ts` — Environment variable loading and validation via Zod.
 - `src/utils/` — Utility functions (e.g., logger, error handling).
 - `src/tagoClient/` — Tago.IO API interaction layer, organized by API tag (e.g., `src/tagoClient/user.ts`, `src/tagoClient/device.ts`). The main client class is in `src/tagoClient/index.ts`.
-- `src/server/` — Code for each implementation of the MCP server e.g. `src/server/http.ts`, `src/server/stdio.ts`. Any common server logic goes into `src/server/common.ts`.
+- `src/server/` — Code for each implementation of the MCP server:
+  - `src/server/stdio.ts` - stdio transport implementation
+  - `src/server/http.ts` - HTTP transport router and shared utilities (Express, CORS, health checks, ngrok)
+  - `src/server/sse.ts` - Server-Sent Events transport (MCP 2024-11-05 spec)
+  - `src/server/stream.ts` - Streamable HTTP transport (MCP 2025-06-18 spec)
+  - `src/server/common.ts` - shared server utilities (SERVER_INFO, tool registration)
 - `src/types/` - centralized type definitions (API, MCP, errors)
 - `src/tools/` - individual MCP tool files and registration.
 - `src/prompts/` - individual MCP prompt files and registration.
@@ -90,6 +95,8 @@ Reference `.env.example`. Primary variables:
 - **DON'T** change anything in `node_modules` or commit any changes to that folder.
 - IMPORTANT: Encapsulate the log implementation in `src/utils/logger.ts` to allow easy modification of the logging behavior in the future. Use this logger throughout the codebase instead of direct console.log statements. The logger adapts based on the mode: when `MCP_SERVER_USE_HTTP=false` (stdio mode), logs go to stderr to avoid interleaving with the MCP output; when `MCP_SERVER_USE_HTTP=true` (HTTP mode), logs go to stdout for standard output.
 - Avoid using the TypeScript `any` type; prefer precise typings or `unknown` when necessary.
-- Any new implementation should be done in both servers, http server and stdio server, to maintain feature parity.
+- Any new HTTP transport implementation should be done in both `src/server/sse.ts` and `src/server/stream.ts` to maintain feature parity between transports.
 - **DON'T** use `process.env.` to access environment variables directly. Access should be done outside of `src/config.ts`. All environment variables must be loaded and validated there using Zod, and then imported where needed.
+- **Configuration validations** should be extracted to `src/utils/config-validations.ts`. No validation logic should exist outside of `src/config.ts` and `src/utils/config-validations.ts`. This includes validations for IP addresses, hostnames, origins, and any other configuration-related validation.
 - Tests should only reside in the `tests/` folder. **DON'T** add test files alongside source files in `src/`.
+- **Test folder structure MUST mirror the `src/` folder structure.** For example, tests for `src/utils/logger.ts` should be in `tests/utils/logger.test.ts`, and tests for `src/server/http.ts` should be in `tests/server/http.test.ts`.

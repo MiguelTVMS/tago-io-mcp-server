@@ -1,5 +1,6 @@
 import * as dotenv from 'dotenv';
 import { z } from 'zod';
+import { isValidBindAddress, isValidOrigin } from './utils/config-validations.js';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -34,13 +35,22 @@ const mcpServerConfigSchema = z.object({
  * MCP Server HTTP Configuration Schema
  */
 const mcpHttpConfigSchema = z.object({
+  MCP_HTTP_TRANSPORT: z.enum(['stream', 'sse']).default('stream'),
   MCP_HTTP_PORT: z
     .string()
     .transform((val) => Number.parseInt(val, 10))
     .pipe(z.number().int().positive())
     .default('3000'),
-  MCP_HTTP_HOST: z.string().default('0.0.0.0'),
-  MCP_HTTP_PATH: z.string().default('/mcp'),
+  MCP_HTTP_PATH: z.string().optional(),
+  MCP_HTTP_BIND_ADDR: z
+    .string()
+    .refine((val) => val.length > 0, {
+      message: 'MCP_HTTP_BIND_ADDR cannot be empty',
+    })
+    .refine((val) => isValidBindAddress(val), {
+      message: 'MCP_HTTP_BIND_ADDR must be a valid IPv4 or IPv6 address',
+    })
+    .default('127.0.0.1'),
   MCP_HTTP_ENABLE_HEALTHCHECK: z
     .string()
     .transform((val) => val === 'true')
@@ -52,14 +62,17 @@ const mcpHttpConfigSchema = z.object({
     .transform((val) => val === 'true')
     .pipe(z.boolean())
     .default('true'),
-  MCP_HTTP_ALLOWED_HOSTS: z
-    .string()
-    .optional()
-    .transform((val) => (val ? val.split(',').map((h) => h.trim()) : undefined)),
   MCP_HTTP_ALLOWED_ORIGINS: z
     .string()
-    .optional()
-    .transform((val) => (val ? val.split(',').map((o) => o.trim()) : undefined)),
+    .refine((val) => val.length > 0, {
+      message: 'MCP_HTTP_ALLOWED_ORIGINS cannot be empty',
+    })
+    .transform((val) => val.split(',').map((o) => o.trim()))
+    .refine((origins) => origins.every((origin) => isValidOrigin(origin)), {
+      message:
+        'All origins in MCP_HTTP_ALLOWED_ORIGINS must be valid hostnames, IPv4, or IPv6 addresses',
+    })
+    .default('127.0.0.1,localhost'),
   MCP_HTTP_NGROK_ENABLED: z
     .string()
     .transform((val) => val === 'true')
@@ -80,18 +93,36 @@ const additionalConfigSchema = z.object({
 /**
  * Combined Configuration Schema
  */
-const configSchema = tagoioConfigSchema
+const configSchemaBase = tagoioConfigSchema
   .merge(mcpServerConfigSchema)
   .merge(mcpHttpConfigSchema)
   .merge(additionalConfigSchema);
 
+const configSchema = configSchemaBase.transform((config) => {
+  // Set default path based on transport if not explicitly provided
+  const path = config.MCP_HTTP_PATH || (config.MCP_HTTP_TRANSPORT === 'sse' ? '/sse' : '/mcp');
+  return {
+    ...config,
+    MCP_HTTP_PATH: path,
+  };
+});
+
 /**
- * Validate ngrok configuration
+ * Validate ngrok configuration and HTTP origins
  */
-const validateNgrokConfig = (config: z.infer<typeof configSchema>) => {
+const validateHttpConfig = (config: z.infer<typeof configSchema>) => {
   if (config.MCP_HTTP_NGROK_ENABLED && !config.MCP_HTTP_NGROK_AUTH_TOKEN) {
     throw new Error('MCP_HTTP_NGROK_AUTH_TOKEN is required when MCP_HTTP_NGROK_ENABLED is true');
   }
+
+  // Warn if wildcard '*' is used in allowed origins
+  if (config.MCP_HTTP_ALLOWED_ORIGINS.includes('*')) {
+    console.warn(
+      '\x1b[33m%s\x1b[0m',
+      'WARNING: MCP_HTTP_ALLOWED_ORIGINS is set to "*" (allow all origins). This should NOT be used in production environments as it exposes your server to security risks.'
+    );
+  }
+
   return config;
 };
 
@@ -111,13 +142,13 @@ const parseConfig = () => {
     MCP_SERVER_STATEFUL: process.env.MCP_SERVER_STATEFUL,
 
     // MCP Server HTTP Configuration
+    MCP_HTTP_TRANSPORT: process.env.MCP_HTTP_TRANSPORT,
     MCP_HTTP_PORT: process.env.MCP_HTTP_PORT,
-    MCP_HTTP_HOST: process.env.MCP_HTTP_HOST,
     MCP_HTTP_PATH: process.env.MCP_HTTP_PATH,
+    MCP_HTTP_BIND_ADDR: process.env.MCP_HTTP_BIND_ADDR,
     MCP_HTTP_ENABLE_HEALTHCHECK: process.env.MCP_HTTP_ENABLE_HEALTHCHECK,
     MCP_HTTP_HEALTHCHECK_PATH: process.env.MCP_HTTP_HEALTHCHECK_PATH,
     MCP_HTTP_ALLOW_CORS: process.env.MCP_HTTP_ALLOW_CORS,
-    MCP_HTTP_ALLOWED_HOSTS: process.env.MCP_HTTP_ALLOWED_HOSTS,
     MCP_HTTP_ALLOWED_ORIGINS: process.env.MCP_HTTP_ALLOWED_ORIGINS,
     MCP_HTTP_NGROK_ENABLED: process.env.MCP_HTTP_NGROK_ENABLED,
     MCP_HTTP_NGROK_AUTH_TOKEN: process.env.MCP_HTTP_NGROK_AUTH_TOKEN,
@@ -129,7 +160,7 @@ const parseConfig = () => {
   };
 
   const parsedConfig = configSchema.parse(rawConfig);
-  return validateNgrokConfig(parsedConfig);
+  return validateHttpConfig(parsedConfig);
 };
 
 /**

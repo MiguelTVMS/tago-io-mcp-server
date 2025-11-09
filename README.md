@@ -86,6 +86,82 @@ The MCP server requires a **TagoIO Profile Token** for authentication:
 
 **Security Note**: Keep your profile token secure and never commit it to version control.
 
+## HTTP Server Mode
+
+The MCP server can run in HTTP mode, allowing remote access and integration with web-based AI clients. This mode supports two transport protocols:
+
+### Transport Protocols
+
+1. **Streamable HTTP** (default, recommended) - [MCP 2025-06-18 Specification](https://modelcontextprotocol.io/specification/2025-06-18/basic/transports)
+   - Bidirectional streaming over SSE
+   - Supports both stateful and stateless modes
+   - Modern protocol with better features
+
+2. **Server-Sent Events (SSE)** - [MCP 2024-11-05 Specification](https://modelcontextprotocol.io/specification/2024-11-05/basic/transports)
+   - Server-to-client via SSE, client-to-server via POST
+   - Session-based communication
+   - Legacy protocol for compatibility
+
+### Configuration
+
+Set `MCP_SERVER_USE_HTTP=true` in your `.env` file to enable HTTP mode:
+
+```bash
+# Enable HTTP server
+MCP_SERVER_USE_HTTP=true
+
+# Choose transport protocol (stream or sse)
+MCP_HTTP_TRANSPORT=stream
+
+# Bind address (defaults to 127.0.0.1 for local-only access)
+MCP_HTTP_BIND_ADDR=127.0.0.1
+
+# Port configuration
+MCP_HTTP_PORT=3000
+
+# Endpoint path (defaults based on transport)
+# - /mcp for stream transport
+# - /sse for sse transport
+MCP_HTTP_PATH=/mcp
+```
+
+### Security Features
+
+The HTTP server includes security protections against DNS rebinding attacks:
+
+- **Origin Validation**: Validates the `Origin` header on all connections
+- **Network Binding**: Binds to loopback address (127.0.0.1) by default for local-only access
+- **Allowed Origins**: Configure `MCP_HTTP_ALLOWED_ORIGINS` with comma-separated list of trusted origins
+
+```bash
+# Security configuration
+MCP_HTTP_ALLOWED_ORIGINS=127.0.0.1,localhost
+MCP_HTTP_BIND_ADDR=127.0.0.1
+
+# Use '*' to allow any origin (NOT recommended for production)
+# MCP_HTTP_ALLOWED_ORIGINS=*
+```
+
+### Public Access with ngrok
+
+For development or remote access, you can expose the server publicly using ngrok:
+
+```bash
+# Enable ngrok tunnel
+MCP_HTTP_NGROK_ENABLED=true
+MCP_HTTP_NGROK_AUTH_TOKEN=your_ngrok_auth_token_here
+```
+
+The ngrok tunnel works with both transport protocols and provides a public URL for accessing your MCP server.
+
+**Warning**: When exposing your server publicly, ensure your TagoIO token has minimal required permissions and consider using an Analysis token instead of a Profile token.
+
+### API Endpoints
+
+For more information about the transport protocols and their implementation, see:
+- [Streamable HTTP Transport Specification](https://modelcontextprotocol.io/specification/2025-06-18/basic/transports)
+- [SSE Transport Specification](https://modelcontextprotocol.io/specification/2024-11-05/basic/transports)
+
 ## Docker Deployment
 
 For containerized deployments, you can use the provided Docker configuration:
