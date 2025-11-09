@@ -94,17 +94,19 @@ const additionalConfigSchema = z.object({
 /**
  * Combined Configuration Schema
  */
-const configSchema = tagoioConfigSchema
+const configSchemaBase = tagoioConfigSchema
   .merge(mcpServerConfigSchema)
   .merge(mcpHttpConfigSchema)
-  .merge(additionalConfigSchema)
-  .transform((config) => {
-    // Set default path based on transport if not explicitly provided
-    if (!config.MCP_HTTP_PATH) {
-      config.MCP_HTTP_PATH = config.MCP_HTTP_TRANSPORT === 'sse' ? '/sse' : '/mcp';
-    }
-    return config;
-  });
+  .merge(additionalConfigSchema);
+
+const configSchema = configSchemaBase.transform((config) => {
+  // Set default path based on transport if not explicitly provided
+  const path = config.MCP_HTTP_PATH || (config.MCP_HTTP_TRANSPORT === 'sse' ? '/sse' : '/mcp');
+  return {
+    ...config,
+    MCP_HTTP_PATH: path,
+  };
+});
 
 /**
  * Validate ngrok configuration

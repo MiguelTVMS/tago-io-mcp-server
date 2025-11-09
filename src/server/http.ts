@@ -2,25 +2,26 @@ import { config } from '../config.js';
 import { logger } from '../utils/logger.js';
 
 /**
- * Start the MCP server using HTTP/SSE transport.
- * This mode allows the server to be accessed via HTTP requests.
+ * Start the MCP server using HTTP transport.
+ * Routes to the appropriate transport implementation based on configuration.
  *
- * NOTE: HTTP server implementation is pending.
- * The following features need to be implemented:
- * 1. Handle authentication per request using authenticateClient()
- * 2. Create MCP server instances (stateful or stateless based on config)
- * 3. Use SSEServerTransport for communication
- * 4. Handle CORS, health checks, and other HTTP concerns
- * 5. Install express and @types/express dependencies
+ * Supported transports:
+ * - SSE (Server-Sent Events): MCP 2024-11-05 specification
+ * - Stream (Streamable HTTP): MCP 2025-06-18 specification
  */
 export async function startHttpServer(): Promise<void> {
   try {
-    logger.info('HTTP server mode is not yet implemented');
-    logger.info(`Would start HTTP server on ${config.MCP_HTTP_HOST}:${config.MCP_HTTP_PORT}`);
-    logger.error(
-      'Please use stdio mode (set MCP_SERVER_USE_HTTP=false) until HTTP implementation is complete'
-    );
-    process.exit(1);
+    logger.info(`Starting HTTP server with ${config.MCP_HTTP_TRANSPORT} transport`);
+
+    if (config.MCP_HTTP_TRANSPORT === 'sse') {
+      // Use SSE transport (MCP 2024-11-05)
+      const { startSseServer } = await import('./sse.js');
+      await startSseServer();
+    } else {
+      // Use Streamable HTTP transport (MCP 2025-06-18)
+      const { startStreamableHttpServer } = await import('./stream.js');
+      await startStreamableHttpServer();
+    }
   } catch (error) {
     logger.error('Failed to start HTTP MCP server', error instanceof Error ? error : undefined);
     process.exit(1);
