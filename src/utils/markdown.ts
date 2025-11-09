@@ -6,7 +6,8 @@
  * - Objects are rendered with nested tables.
  * - Primitives are rendered as strings.
  */
-export function convertJSONToMarkdown(data: unknown): string {
+// biome-ignore lint/suspicious/noExplicitAny: Accepts any JSON-serializable data for conversion
+export function convertJSONToMarkdown(data: any): string {
   if (Array.isArray(data)) {
     if (data.length === 0) {
       return '_No data found._';

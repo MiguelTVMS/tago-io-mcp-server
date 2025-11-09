@@ -146,7 +146,8 @@ const querySchema = z.object({
 });
 
 // Query validation utility
-function validateDeviceDataQuery(query: unknown): DataQuery | undefined {
+// biome-ignore lint/suspicious/noExplicitAny: Query validation requires flexible input handling
+function validateDeviceDataQuery(query: any): DataQuery | undefined {
   if (!query) {
     return undefined;
   }
