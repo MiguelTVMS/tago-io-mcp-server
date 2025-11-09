@@ -84,7 +84,7 @@ const analysisSchema = analysisBaseSchema.refine(
 type AnalysisSchema = z.infer<typeof analysisSchema>;
 
 // biome-ignore lint/suspicious/noExplicitAny: Query validation requires flexible input handling
-function validateAnalysisQuery(query: any): any {
+function validateAnalysisQuery(query: any): AnalysisQuery | undefined {
   if (!query) {
     return undefined;
   }
