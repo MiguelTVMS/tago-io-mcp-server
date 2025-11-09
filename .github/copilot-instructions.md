@@ -92,4 +92,6 @@ Reference `.env.example`. Primary variables:
 - Avoid using the TypeScript `any` type; prefer precise typings or `unknown` when necessary.
 - Any new implementation should be done in both servers, http server and stdio server, to maintain feature parity.
 - **DON'T** use `process.env.` to access environment variables directly. Access should be done outside of `src/config.ts`. All environment variables must be loaded and validated there using Zod, and then imported where needed.
+- **Configuration validations** should be extracted to `src/utils/config-validations.ts`. No validation logic should exist outside of `src/config.ts` and `src/utils/config-validations.ts`. This includes validations for IP addresses, hostnames, origins, and any other configuration-related validation.
 - Tests should only reside in the `tests/` folder. **DON'T** add test files alongside source files in `src/`.
+- **Test folder structure MUST mirror the `src/` folder structure.** For example, tests for `src/utils/logger.ts` should be in `tests/utils/logger.test.ts`, and tests for `src/server/http.ts` should be in `tests/server/http.test.ts`.
