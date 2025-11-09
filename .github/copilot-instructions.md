@@ -41,7 +41,7 @@ Reference `.env.example`. Primary variables:
 - `MCP_HTTP_ENABLE_HEALTHCHECK` (default: `true`) - enable a healthcheck endpoint at the path indicated on `MCP_HTTP_HEALTHCHECK_PATH`.
 - `MCP_HTTP_HEALTHCHECK_PATH` (default: `/healthz`) - path for the healthcheck endpoint.
 - `MCP_HTTP_ALLOW_CORS` (default: `true`) - enable CORS for the HTTP server.
-- `MCP_HTTP_ALLOWED_ORIGINS` (default: `127.0.0.1,localhost`) - comma-separated list of allowed origins for DNS rebinding protection. Must be valid hostnames, IPv4, or IPv6 addresses. Required for security.
+- `MCP_HTTP_ALLOWED_ORIGINS` (default: `127.0.0.1,localhost`) - comma-separated list of allowed origins for DNS rebinding protection. Must be valid hostnames, IPv4, or IPv6 addresses. Use `*` to allow any origin (NOT recommended for production). Required for security.
 - `MCP_HTTP_NGROK_ENABLED` (default: `false`) - whether to use ngrok to expose the HTTP server publicly. Works with both `stream` and `sse` transports.
 - `MCP_HTTP_NGROK_AUTH_TOKEN` (optional) - ngrok auth token, required if `MCP_HTTP_NGROK_ENABLED` is `true`.
 
@@ -53,8 +53,7 @@ Reference `.env.example`. Primary variables:
 - `src/tagoClient/` — Tago.IO API interaction layer, organized by API tag (e.g., `src/tagoClient/user.ts`, `src/tagoClient/device.ts`). The main client class is in `src/tagoClient/index.ts`.
 - `src/server/` — Code for each implementation of the MCP server:
   - `src/server/stdio.ts` - stdio transport implementation
-  - `src/server/http.ts` - HTTP transport router (delegates to sse.ts or stream.ts)
-  - `src/server/http-common.ts` - shared HTTP server logic (Express, CORS, health checks, ngrok)
+  - `src/server/http.ts` - HTTP transport router and shared utilities (Express, CORS, health checks, ngrok)
   - `src/server/sse.ts` - Server-Sent Events transport (MCP 2024-11-05 spec)
   - `src/server/stream.ts` - Streamable HTTP transport (MCP 2025-06-18 spec)
   - `src/server/common.ts` - shared server utilities (SERVER_INFO, tool registration)

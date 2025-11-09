@@ -108,12 +108,21 @@ const configSchema = configSchemaBase.transform((config) => {
 });
 
 /**
- * Validate ngrok configuration
+ * Validate ngrok configuration and HTTP origins
  */
-const validateNgrokConfig = (config: z.infer<typeof configSchema>) => {
+const validateHttpConfig = (config: z.infer<typeof configSchema>) => {
   if (config.MCP_HTTP_NGROK_ENABLED && !config.MCP_HTTP_NGROK_AUTH_TOKEN) {
     throw new Error('MCP_HTTP_NGROK_AUTH_TOKEN is required when MCP_HTTP_NGROK_ENABLED is true');
   }
+
+  // Warn if wildcard '*' is used in allowed origins
+  if (config.MCP_HTTP_ALLOWED_ORIGINS.includes('*')) {
+    console.warn(
+      '\x1b[33m%s\x1b[0m',
+      'WARNING: MCP_HTTP_ALLOWED_ORIGINS is set to "*" (allow all origins). This should NOT be used in production environments as it exposes your server to security risks.'
+    );
+  }
+
   return config;
 };
 
@@ -151,7 +160,7 @@ const parseConfig = () => {
   };
 
   const parsedConfig = configSchema.parse(rawConfig);
-  return validateNgrokConfig(parsedConfig);
+  return validateHttpConfig(parsedConfig);
 };
 
 /**

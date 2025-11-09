@@ -11,7 +11,7 @@ import {
   setupHealthCheck,
   setupNgrokTunnel,
   startExpressServer,
-} from './http-common.js';
+} from './http.js';
 
 /**
  * Start the MCP server using HTTP with SSE transport (MCP 2024-11-05 spec).

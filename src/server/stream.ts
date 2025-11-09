@@ -12,7 +12,7 @@ import {
   setupHealthCheck,
   setupNgrokTunnel,
   startExpressServer,
-} from './http-common.js';
+} from './http.js';
 
 /**
  * Start the MCP server using Streamable HTTP transport (MCP 2025-06-18 spec).

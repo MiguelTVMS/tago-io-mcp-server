@@ -184,6 +184,10 @@ describe('isValidOrigin', () => {
     expect(isValidOrigin('2001:db8::1')).toBe(true);
   });
 
+  it('should accept wildcard * for any origin', () => {
+    expect(isValidOrigin('*')).toBe(true);
+  });
+
   it('should reject invalid origins', () => {
     expect(isValidOrigin('')).toBe(false);
     expect(isValidOrigin('invalid_hostname')).toBe(false);

@@ -85,11 +85,15 @@ export function isValidIP(ip: string): boolean {
 }
 
 /**
- * Validates if a string is a valid origin (hostname or IP)
+ * Validates if a string is a valid origin (hostname, IP, or wildcard)
  * @param origin - The origin to validate
  * @returns true if valid origin, false otherwise
  */
 export function isValidOrigin(origin: string): boolean {
+  // Allow wildcard '*' for any origin (NOT recommended for production)
+  if (origin === '*') {
+    return true;
+  }
   return isValidHostname(origin) || isValidIP(origin);
 }
 

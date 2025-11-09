@@ -137,6 +137,9 @@ The HTTP server includes security protections against DNS rebinding attacks:
 # Security configuration
 MCP_HTTP_ALLOWED_ORIGINS=127.0.0.1,localhost
 MCP_HTTP_BIND_ADDR=127.0.0.1
+
+# Use '*' to allow any origin (NOT recommended for production)
+# MCP_HTTP_ALLOWED_ORIGINS=*
 ```
 
 ### Public Access with ngrok
