@@ -36,7 +36,6 @@ Reference `.env.example`. Primary variables:
 
 - `MCP_HTTP_TRANSPORT` (default: `stream`) - HTTP transport protocol (`stream` for Streamable HTTP per MCP 2025-06-18 spec, `sse` for Server-Sent Events per MCP 2024-11-05 spec).
 - `MCP_HTTP_PORT` (default: `3000`) - port for the HTTP server.
-- `MCP_HTTP_HOST` (default: `0.0.0.0`) - host for the HTTP server (deprecated, use `MCP_HTTP_BIND_ADDR` instead).
 - `MCP_HTTP_PATH` - base path for MCP HTTP endpoints. Defaults to `/mcp` for `stream` transport and `/sse` for `sse` transport if not specified.
 - `MCP_HTTP_BIND_ADDR` (default: `127.0.0.1`) - network bind address (IPv4 or IPv6) for security. Defaults to loopback for local-only access.
 - `MCP_HTTP_ENABLE_HEALTHCHECK` (default: `true`) - enable a healthcheck endpoint at the path indicated on `MCP_HTTP_HEALTHCHECK_PATH`.

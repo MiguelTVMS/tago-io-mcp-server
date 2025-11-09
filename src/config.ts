@@ -41,7 +41,6 @@ const mcpHttpConfigSchema = z.object({
     .transform((val) => Number.parseInt(val, 10))
     .pipe(z.number().int().positive())
     .default('3000'),
-  MCP_HTTP_HOST: z.string().default('0.0.0.0'),
   MCP_HTTP_PATH: z.string().optional(),
   MCP_HTTP_BIND_ADDR: z
     .string()
@@ -136,7 +135,6 @@ const parseConfig = () => {
     // MCP Server HTTP Configuration
     MCP_HTTP_TRANSPORT: process.env.MCP_HTTP_TRANSPORT,
     MCP_HTTP_PORT: process.env.MCP_HTTP_PORT,
-    MCP_HTTP_HOST: process.env.MCP_HTTP_HOST,
     MCP_HTTP_PATH: process.env.MCP_HTTP_PATH,
     MCP_HTTP_BIND_ADDR: process.env.MCP_HTTP_BIND_ADDR,
     MCP_HTTP_ENABLE_HEALTHCHECK: process.env.MCP_HTTP_ENABLE_HEALTHCHECK,
