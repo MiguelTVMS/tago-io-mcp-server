@@ -6,9 +6,7 @@
     "tago-mcp-server": "build/index.js"
   },
   "type": "commonjs",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "lint": "biome check .",
@@ -27,13 +25,7 @@
     "docker:logs": "docker-compose logs -f tago-mcp-server",
     "docker:logs:dev": "docker-compose -f docker-compose.dev.yml logs -f tago-mcp-server-dev"
   },
-  "keywords": [
-    "mcp",
-    "model-context-protocol",
-    "tagoio",
-    "ai",
-    "tools"
-  ],
+  "keywords": ["mcp", "model-context-protocol", "tagoio", "ai", "tools"],
   "author": {
     "name": "João Miguel Tabosa Vaz Marques Silva",
     "email": "joao@miguel.ms"
