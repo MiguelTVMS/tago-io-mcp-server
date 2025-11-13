@@ -3,6 +3,7 @@ import type { Resources } from '@tago-io/sdk';
 import { z } from 'zod';
 
 import type { SecretsQuery } from '@tago-io/sdk';
+import { getProfileInfo, listSecrets } from '../tagoClient/api/index.js';
 import type { IDeviceToolConfig } from '../types/index.js';
 import { convertJSONToMarkdown } from '../utils/markdown.js';
 
@@ -44,7 +45,7 @@ async function profileLookupTool(resources: Resources, params: ProfileLookupSche
   let data: unknown;
 
   if (params.operation === 'profile_info') {
-    data = await resources.profiles.info('current').catch((error) => {
+    data = await getProfileInfo(resources, 'current').catch((error) => {
       throw new Error(`**Error fetching profile information:** ${error}`);
     });
   }
@@ -72,7 +73,7 @@ async function profileLookupTool(resources: Resources, params: ProfileLookupSche
 
     // Only pass query if at least one parameter is provided
     const hasQuery = Object.keys(query).length > 0;
-    data = await resources.secrets.list(hasQuery ? query : undefined).catch((error) => {
+    data = await listSecrets(resources, hasQuery ? query : undefined).catch((error) => {
       throw new Error(`**Error fetching secrets list:** ${error}`);
     });
   }

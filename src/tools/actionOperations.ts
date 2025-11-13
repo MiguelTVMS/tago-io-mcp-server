@@ -5,6 +5,13 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { Resources } from '@tago-io/sdk';
 import type { ActionCreateInfo, ActionQuery } from '@tago-io/sdk';
 import { z } from 'zod';
+import {
+  createAction as apiCreateAction,
+  deleteAction as apiDeleteAction,
+  updateAction as apiUpdateAction,
+  getActionInfo,
+  listActions,
+} from '../tagoClient/api/index.js';
 import type { IDeviceToolConfig } from '../types/index.js';
 import { querySchema, tagsObjectModel } from '../utils/global-params.model.js';
 import { convertJSONToMarkdown } from '../utils/markdown.js';
@@ -410,12 +417,12 @@ async function handleLookupOperation(
   const { actionID, lookupAction } = params;
 
   if (actionID) {
-    const result = await resources.actions.info(actionID);
+    const result = await getActionInfo(resources, actionID);
     return convertJSONToMarkdown(result);
   }
 
   const validatedQuery = validateActionQuery(lookupAction);
-  const actions = await resources.actions.list(validatedQuery).catch((error) => {
+  const actions = await listActions(resources, validatedQuery).catch((error) => {
     throw new Error(`**Error fetching actions:** ${(error as Error)?.message ?? error}`);
   });
 
@@ -430,7 +437,7 @@ async function handleCreateOperation(
     throw new Error('createAction is required for create operation');
   }
 
-  const result = await resources.actions.create(params.createAction as ActionCreateInfo);
+  const result = await apiCreateAction(resources, params.createAction as ActionCreateInfo);
   return convertJSONToMarkdown(result);
 }
 
@@ -448,7 +455,11 @@ async function handleUpdateOperation(
     throw new Error('updateAction is required for update operation');
   }
 
-  const result = await resources.actions.edit(actionID, updateAction as Partial<ActionCreateInfo>);
+  const result = await apiUpdateAction(
+    resources,
+    actionID,
+    updateAction as Partial<ActionCreateInfo>
+  );
   // SDK returns string for edit operation
   return String(result);
 }
@@ -463,7 +474,7 @@ async function handleDeleteOperation(
     throw new Error('actionID is required for delete operation');
   }
 
-  const result = await resources.actions.delete(actionID);
+  const result = await apiDeleteAction(resources, actionID);
   // SDK returns string for delete operation
   return String(result);
 }

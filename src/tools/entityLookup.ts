@@ -5,6 +5,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { Resources } from '@tago-io/sdk';
 import type { EntityQuery } from '@tago-io/sdk';
 import { z } from 'zod';
+import { getEntityInfo, listEntities } from '../tagoClient/api/index.js';
 import type { IDeviceToolConfig } from '../types/index.js';
 import { querySchema, tagsObjectModel } from '../utils/global-params.model.js';
 import { convertJSONToMarkdown } from '../utils/markdown.js';
@@ -109,12 +110,12 @@ async function handleLookupOperation(resources: Resources, params: EntitySchema)
   const { entityID, lookupEntity } = params;
 
   if (entityID) {
-    const result = await resources.entities.info(entityID);
+    const result = await getEntityInfo(resources, entityID);
     return convertJSONToMarkdown(result);
   }
 
   const validatedQuery = validateEntityQuery(lookupEntity);
-  const entities = await resources.entities.list(validatedQuery).catch((error) => {
+  const entities = await listEntities(resources, validatedQuery).catch((error) => {
     throw new Error(`**Error fetching entities:** ${(error as Error)?.message ?? error}`);
   });
 

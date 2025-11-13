@@ -2,10 +2,20 @@
 // This causes cascading unsafe operation warnings throughout this file
 
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { Device, type Resources } from '@tago-io/sdk';
+import type { Resources } from '@tago-io/sdk';
 import type { DataCreate, DataEdit, DataQuery } from '@tago-io/sdk';
 import { z } from 'zod';
 import { config } from '../config.js';
+import {
+  createDeviceInstance,
+  editDataWithDeviceToken,
+  editDeviceData,
+  getDataWithDeviceToken,
+  getDeviceData,
+  listDeviceTokens,
+  sendDataWithDeviceToken,
+  sendDeviceData,
+} from '../tagoClient/api/index.js';
 import type { IDeviceToolConfig } from '../types/index.js';
 import { convertJSONToMarkdown } from '../utils/markdown.js';
 import { createOperationFactory } from '../utils/operation-factory.js';
@@ -309,17 +319,17 @@ interface IDeviceDataHandler {
 function createAnalysisTokenHandler(resources: Resources): IDeviceDataHandler {
   return {
     async create(deviceID: string, data: DataCreate[]): Promise<string> {
-      const result = await resources.devices.sendDeviceData(deviceID, data);
+      const result = await sendDeviceData(resources, deviceID, data);
       return convertJSONToMarkdown(result);
     },
 
     async update(deviceID: string, data: DataEdit[]): Promise<string> {
-      const result = await resources.devices.editDeviceData(deviceID, data);
+      const result = await editDeviceData(resources, deviceID, data);
       return convertJSONToMarkdown(result);
     },
 
     async read(deviceID: string, query?: DataQuery): Promise<string> {
-      const result = await resources.devices.getDeviceData(deviceID, query);
+      const result = await getDeviceData(resources, deviceID, query);
       return convertJSONToMarkdown(result);
     },
   };
@@ -328,18 +338,16 @@ function createAnalysisTokenHandler(resources: Resources): IDeviceDataHandler {
 // Device token handler implementation
 function createDeviceTokenHandler(resources: Resources, _api: string): IDeviceDataHandler {
   // Cache device instances to avoid creating them multiple times for the same device
-  const deviceCache = new Map<string, Device>();
+  const deviceCache = new Map<string, ReturnType<typeof createDeviceInstance>>();
 
-  const getDeviceInstance = async (deviceID: string): Promise<Device> => {
+  const getDeviceInstance = async (deviceID: string) => {
     const cached = deviceCache.get(deviceID);
     if (cached) {
       return cached;
     }
 
-    const [deviceToken] = await resources.devices.tokenList(deviceID);
-    const device = new Device({
-      token: deviceToken.token,
-    });
+    const [deviceToken] = await listDeviceTokens(resources, deviceID);
+    const device = createDeviceInstance(deviceToken.token);
 
     deviceCache.set(deviceID, device);
     return device;
@@ -348,22 +356,21 @@ function createDeviceTokenHandler(resources: Resources, _api: string): IDeviceDa
   return {
     async create(deviceID: string, data: DataCreate[]): Promise<string> {
       const device = await getDeviceInstance(deviceID);
-      const result = await device.sendData(data);
+      const result = await sendDataWithDeviceToken(device, data);
       // SDK returns string for device token operations
       return String(result);
     },
 
     async update(deviceID: string, data: DataEdit[]): Promise<string> {
       const device = await getDeviceInstance(deviceID);
-      const result = await device.editData(data);
+      const result = await editDataWithDeviceToken(device, data);
       // SDK returns string for device token operations
       return String(result);
     },
 
     async read(deviceID: string, query?: DataQuery): Promise<string> {
       const device = await getDeviceInstance(deviceID);
-      // @ts-expect-error - The getData method is not typed according to the DataQuery type from the Resources.
-      const result = await device.getData(query);
+      const result = await getDataWithDeviceToken(device, query);
       return convertJSONToMarkdown(result);
     },
   };

@@ -4,6 +4,7 @@ import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { Resources } from '@tago-io/sdk';
 import type { UserQuery } from '@tago-io/sdk';
 import { z } from 'zod';
+import { getRunUserInfo, listRunUsers } from '../tagoClient/api/index.js';
 import type { IDeviceToolConfig } from '../types/index.js';
 import { querySchema, tagsObjectModel } from '../utils/global-params.model.js';
 import { convertJSONToMarkdown } from '../utils/markdown.js';
@@ -126,12 +127,12 @@ async function handleLookupOperation(resources: Resources, params: UserSchema): 
   const { runUserID, lookupUser } = params;
 
   if (runUserID) {
-    const result = await resources.run.userInfo(runUserID);
+    const result = await getRunUserInfo(resources, runUserID);
     return convertJSONToMarkdown(result);
   }
 
   const validatedQuery = validateUserQuery(lookupUser);
-  const users = await resources.run.listUsers(validatedQuery).catch((error) => {
+  const users = await listRunUsers(resources, validatedQuery).catch((error) => {
     throw new Error(`**Error fetching users:** ${(error as Error)?.message ?? error}`);
   });
 

@@ -6,6 +6,12 @@ import type { Resources } from '@tago-io/sdk';
 import type { NetworkQuery } from '@tago-io/sdk';
 import type { ConnectorQuery } from '@tago-io/sdk';
 import { z } from 'zod';
+import {
+  getConnectorInfo,
+  getNetworkInfo,
+  listConnectors,
+  listNetworks,
+} from '../tagoClient/api/index.js';
 import type { IDeviceToolConfig } from '../types/index.js';
 import { convertJSONToMarkdown } from '../utils/markdown.js';
 
@@ -82,12 +88,12 @@ function isValidId(value: string): boolean {
 
 async function lookupNetwork(resources: Resources, queryObj: IntegrationQuery): Promise<string> {
   if (queryObj.id && isValidId(queryObj.id)) {
-    const result = await resources.integration.networks.info(queryObj.id);
+    const result = await getNetworkInfo(resources, queryObj.id);
     return convertJSONToMarkdown(result);
   }
 
   const validatedQuery = validateNetworkQuery(queryObj);
-  const networks = await resources.integration.networks.list(validatedQuery).catch((error) => {
+  const networks = await listNetworks(resources, validatedQuery).catch((error) => {
     throw new Error(`**Error fetching networks:** ${(error as Error)?.message ?? error}`);
   });
   return convertJSONToMarkdown(networks);
@@ -95,12 +101,12 @@ async function lookupNetwork(resources: Resources, queryObj: IntegrationQuery): 
 
 async function lookupConnector(resources: Resources, queryObj: IntegrationQuery): Promise<string> {
   if (queryObj.id && isValidId(queryObj.id)) {
-    const result = await resources.integration.connectors.info(queryObj.id);
+    const result = await getConnectorInfo(resources, queryObj.id);
     return convertJSONToMarkdown(result);
   }
 
   const validatedQuery = validateConnectorQuery(queryObj);
-  const connectors = await resources.integration.connectors.list(validatedQuery).catch((error) => {
+  const connectors = await listConnectors(resources, validatedQuery).catch((error) => {
     throw new Error(`**Error fetching connectors:** ${(error as Error)?.message ?? error}`);
   });
   return convertJSONToMarkdown(connectors);

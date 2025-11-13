@@ -7,6 +7,19 @@ import type {
   Resources,
 } from '@tago-io/sdk';
 import { z } from 'zod';
+import {
+  createDevice as apiCreateDevice,
+  deleteDevice as apiDeleteDevice,
+  updateDevice as apiUpdateDevice,
+  createDeviceToken,
+  deleteDeviceToken,
+  getDeviceDataAmount,
+  getDeviceInfo,
+  listDeviceParams,
+  listDeviceTokens,
+  listDevices,
+  setDeviceParams,
+} from '../tagoClient/api/index.js';
 import type { IDeviceToolConfig } from '../types/index.js';
 import { querySchema, tagsObjectModel } from '../utils/global-params.model.js';
 import { convertJSONToMarkdown } from '../utils/markdown.js';
@@ -280,12 +293,12 @@ async function handleLookupOperation(resources: Resources, params: DeviceSchema)
   const { deviceID, lookupDevice } = params;
 
   if (deviceID) {
-    const result = await resources.devices.info(deviceID);
+    const result = await getDeviceInfo(resources, deviceID);
     return convertJSONToMarkdown(result);
   }
 
   const validatedQuery = validateDeviceQuery(lookupDevice);
-  const devices = await resources.devices.list(validatedQuery).catch((error) => {
+  const devices = await listDevices(resources, validatedQuery).catch((error) => {
     throw new Error(`**Error fetching devices:** ${(error as Error)?.message ?? error}`);
   });
 
@@ -305,12 +318,12 @@ async function handleLookupOperation(resources: Resources, params: DeviceSchema)
     let deviceInfo: DeviceWithMoreInfo = { ...devices[0] } as unknown as DeviceWithMoreInfo;
 
     if (lookupDevice?.include_data_amount) {
-      const dataAmount = await resources.devices.amount(devices[0].id);
+      const dataAmount = await getDeviceDataAmount(resources, devices[0].id);
       deviceInfo = { ...deviceInfo, data_amount: dataAmount };
     }
 
     if (lookupDevice?.include_configuration_params) {
-      const configurationParams = await resources.devices.paramList(devices[0].id);
+      const configurationParams = await listDeviceParams(resources, devices[0].id);
       deviceInfo = { ...deviceInfo, configuration_params: configurationParams };
     }
 
@@ -328,7 +341,7 @@ async function handleCreateOperation(resources: Resources, params: DeviceSchema)
   const { configuration_params, ...deviceData } = params.createDevice;
 
   // Create the device without configuration parameters
-  const result = await resources.devices.create(deviceData as DeviceCreateInfo);
+  const result = await apiCreateDevice(resources, deviceData as DeviceCreateInfo);
 
   // If configuration parameters were provided, set them after device creation
   if (configuration_params && configuration_params.length > 0) {
@@ -339,7 +352,7 @@ async function handleCreateOperation(resources: Resources, params: DeviceSchema)
         value: param.value,
       }));
 
-      await resources.devices.paramSet(result.device_id, configParams);
+      await setDeviceParams(resources, result.device_id, configParams);
     } catch (error) {
       return convertJSONToMarkdown({
         device: result,
@@ -367,16 +380,16 @@ async function handleUpdateOperation(resources: Resources, params: DeviceSchema)
     updateDevice.payload_decoder = Buffer.from(updateDevice.payload_decoder).toString('base64');
   }
 
-  let tokenObject: Awaited<ReturnType<typeof resources.devices.tokenList>>[0] | undefined;
+  let tokenObject: Awaited<ReturnType<typeof listDeviceTokens>>[0] | undefined;
   if (updateDevice.network || updateDevice.connector || updateDevice.serie_number) {
-    [tokenObject] = await resources.devices.tokenList(deviceID);
-    await resources.devices.tokenDelete(tokenObject.token);
+    [tokenObject] = await listDeviceTokens(resources, deviceID);
+    await deleteDeviceToken(resources, tokenObject.token);
   }
 
-  const result = await resources.devices.edit(deviceID, updateDevice as DeviceEditInfo);
+  const result = await apiUpdateDevice(resources, deviceID, updateDevice as DeviceEditInfo);
 
   if (tokenObject) {
-    await resources.devices.tokenCreate(deviceID, {
+    await createDeviceToken(resources, deviceID, {
       name: tokenObject.name,
       permission: 'full',
       serie_number: updateDevice.serie_number ?? tokenObject.serie_number ?? undefined,
@@ -394,7 +407,7 @@ async function handleDeleteOperation(resources: Resources, params: DeviceSchema)
     throw new Error('deviceID is required for delete operation');
   }
 
-  const result = await resources.devices.delete(deviceID);
+  const result = await apiDeleteDevice(resources, deviceID);
   // SDK returns string for delete operation
   return String(result);
 }
@@ -417,7 +430,7 @@ async function handleConfigureOperation(
 
   for (const configParam of configureDevice.configuration_params) {
     try {
-      const result = await resources.devices.paramSet(deviceID, {
+      const result = await setDeviceParams(resources, deviceID, {
         id: configParam.id,
         sent: configParam.sent,
         key: configParam.key,

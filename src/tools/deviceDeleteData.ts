@@ -2,10 +2,16 @@
 // This causes cascading unsafe operation warnings throughout this file
 
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { Device, type Resources } from '@tago-io/sdk';
+import type { Resources } from '@tago-io/sdk';
 import type { DataQuery } from '@tago-io/sdk';
 import { z } from 'zod';
 import { config } from '../config.js';
+import {
+  createDeviceInstance,
+  deleteDataWithDeviceToken,
+  deleteDeviceData,
+  listDeviceTokens,
+} from '../tagoClient/api/index.js';
 import type { IDeviceToolConfig } from '../types/index.js';
 
 const querySchema = z.object({
@@ -213,7 +219,7 @@ async function deleteWithAnalysisToken(
   deviceID: string,
   query?: DataQuery
 ): Promise<string> {
-  const result = await resources.devices.deleteDeviceData(deviceID, query);
+  const result = await deleteDeviceData(resources, deviceID, query);
   // SDK returns string for delete operation
   return String(result);
 }
@@ -225,12 +231,10 @@ async function deleteWithDeviceToken(
   deviceID: string,
   query?: DataQuery
 ): Promise<string> {
-  const [deviceToken] = await resources.devices.tokenList(deviceID);
-  const device = new Device({
-    token: deviceToken.token,
-  });
+  const [deviceToken] = await listDeviceTokens(resources, deviceID);
+  const device = createDeviceInstance(deviceToken.token);
 
-  const result = await device.deleteData(query);
+  const result = await deleteDataWithDeviceToken(device, query);
   // SDK returns string for delete operation
   return String(result);
 }

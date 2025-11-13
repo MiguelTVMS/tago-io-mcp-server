@@ -3,6 +3,7 @@ import type { Resources } from '@tago-io/sdk';
 import { z } from 'zod';
 
 import type { ProfileSummary } from '@tago-io/sdk';
+import { getProfileSummary, getProfileUsageStatistics } from '../tagoClient/api/index.js';
 import type { IDeviceToolConfig } from '../types/index.js';
 import { getProfileID } from '../utils/get-profile-id.js';
 import { convertJSONToMarkdown } from '../utils/markdown.js';
@@ -47,7 +48,7 @@ async function profileMetricsTool(resources: Resources, params: ProfileMetricsSc
   let data: unknown;
 
   if (params.type === 'limits') {
-    const rawLimits = await resources.profiles.summary(profileID).catch((error) => {
+    const rawLimits = await getProfileSummary(resources, profileID).catch((error) => {
       throw new Error(`**Error fetching profile limits:** ${error}`);
     });
 
@@ -80,12 +81,14 @@ async function profileMetricsTool(resources: Resources, params: ProfileMetricsSc
     // Only pass options if at least one parameter is provided
     const hasOptions = Object.keys(options).length > 0;
 
-    data = await resources.profiles
+    data = await getProfileUsageStatistics(
+      resources,
+      profileID,
       // biome-ignore lint/suspicious/noExplicitAny: SDK type mismatch, options are dynamically built
-      .usageStatisticList(profileID, hasOptions ? (options as any) : undefined)
-      .catch((error) => {
-        throw new Error(`**Error fetching profile statistics:** ${error}`);
-      });
+      hasOptions ? (options as any) : undefined
+    ).catch((error) => {
+      throw new Error(`**Error fetching profile statistics:** ${error}`);
+    });
   }
 
   if (!data) {

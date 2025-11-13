@@ -1,6 +1,7 @@
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { AnalysisQuery, Resources } from '@tago-io/sdk';
 import { z } from 'zod';
+import { getAnalysisInfo, listAnalyses } from '../tagoClient/api/index.js';
 import type { IDeviceToolConfig } from '../types/index.js';
 import { querySchema, tagsObjectModel } from '../utils/global-params.model.js';
 import { convertJSONToMarkdown } from '../utils/markdown.js';
@@ -124,12 +125,12 @@ async function handleLookupOperation(
   const { analysisID, lookupAnalysis } = params;
 
   if (analysisID) {
-    const result = await resources.analysis.info(analysisID);
+    const result = await getAnalysisInfo(resources, analysisID);
     return convertJSONToMarkdown(result);
   }
 
   const validatedQuery = validateAnalysisQuery(lookupAnalysis);
-  const analyses = await resources.analysis.list(validatedQuery).catch((error) => {
+  const analyses = await listAnalyses(resources, validatedQuery).catch((error) => {
     throw new Error(`**Error fetching analyses:** ${(error as Error)?.message ?? error}`);
   });
 
