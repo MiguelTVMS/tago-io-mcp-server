@@ -9,22 +9,22 @@ import { z } from 'zod';
  * Defines the various query modes available for fetching device data
  */
 export const dataQueryTypeSchema = z.enum([
-    'default',
-    'last_item',
-    'last_value',
-    'last_location',
-    'last_insert',
-    'first_item',
-    'first_value',
-    'first_location',
-    'first_insert',
-    'min',
-    'max',
-    'count',
-    'avg',
-    'sum',
-    'aggregate',
-    'conditional',
+  'default',
+  'last_item',
+  'last_value',
+  'last_location',
+  'last_insert',
+  'first_item',
+  'first_value',
+  'first_location',
+  'first_insert',
+  'min',
+  'max',
+  'count',
+  'avg',
+  'sum',
+  'aggregate',
+  'conditional',
 ]);
 
 export type DataQueryType = z.infer<typeof dataQueryTypeSchema>;
@@ -41,16 +41,16 @@ export type TimeInterval = z.infer<typeof timeIntervalSchema>;
  * Comparison functions for conditional and aggregate queries
  */
 export const comparisonFunctionSchema = z.enum([
-    'avg',
-    'sum',
-    'min',
-    'max',
-    'gt',
-    'gte',
-    'lt',
-    'lte',
-    'eq',
-    'ne',
+  'avg',
+  'sum',
+  'min',
+  'max',
+  'gt',
+  'gte',
+  'lt',
+  'lte',
+  'eq',
+  'ne',
 ]);
 
 export type ComparisonFunction = z.infer<typeof comparisonFunctionSchema>;
